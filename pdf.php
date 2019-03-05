@@ -78,16 +78,20 @@ add_action('wp_ajax_pdf', function(){
 	$index = $zip_codes		= array();
 
 	//main sections are here manually to preserve book order
-	print "inside the pdf.php";
+//	print "inside the pdf.php about to do regions array<br>";
 	$regions = array();
 	foreach (array(
-
+				"ma",
+				"me",
+				"nh",
+				"ri",
+				"vt"
 	) as $region) {
 		$region_id = $wpdb->get_var('SELECT term_id FROM wp_8ngygs8ysn_terms where name = "' . $region . '"');
 		if (!$region_id) die('could not find region with name ' . $region);
 		$regions[$region_id] = array();
 	}
-
+//	print "finished the regions array thingie<br>";
 	//symbols used in the book, in the order in which they're applied
 	$symbols = array(
 		'*',   '^',   '#',   '!',   '+',   '@',   '%',
@@ -97,6 +101,7 @@ add_action('wp_ajax_pdf', function(){
 
 	//load libraries
 	require_once('vendor/autoload.php');
+
 	require_once('mytcpdf.php');
 
 	//run function to attach meeting data to $regions
@@ -104,17 +109,18 @@ add_action('wp_ajax_pdf', function(){
 
 	//create new PDF
 	$pdf = new MyTCPDF();
+	$pdf->NewPage();
 
 	foreach ($regions as $region) {
+		//print "inside loop $region <br>";
 		$pdf->header = $region['name'];
-		$pdf->NewPage();
 
+		/* let's not make a new page for each new region
+		$pdf->NewPage();
+		*/
 		if (!empty($region['sub_regions'])) {
 
-			//make page jump for city borough zone maps
-			if (!in_array($region['name'], array('Manhattan', 'Westchester County'))) $pdf->addPage();
-
-			//array_shift($region['sub_regions']);
+					//array_shift($region['sub_regions']);
 			foreach ($region['sub_regions'] as $sub_region => $rows) {
 
 				//create a new page if there's not enough space
@@ -139,6 +145,7 @@ add_action('wp_ajax_pdf', function(){
 		//break; //for debugging
 	}
 
+/* let's skip the index page
 	//index
 	ksort($index);
 	$pdf->header = 'Index';
@@ -146,7 +153,9 @@ add_action('wp_ajax_pdf', function(){
 	$pdf->SetEqualColumns(3, $index_width);
 	$pdf->SetCellPaddings(0, 1, 0, 1);
 	$index_output = '';
+
 	foreach ($index as $category => $rows) {
+
 		ksort($rows);
 		$pdf->SetFont($font_index_header[0], $font_index_header[1], $font_index_header[2]);
 		$pdf->Cell(0, 0, $category, array('B'=>array('width' => .25)), 1);
@@ -159,18 +168,24 @@ add_action('wp_ajax_pdf', function(){
 		}
 		$pdf->Ln(4);
 	}
+*/
 
+/* let's skip the zips
 	//zips are a little different, because page numbers is an array
 	$pdf->SetFont($font_index_header[0], $font_index_header[1], $font_index_header[2]);
 	$pdf->Cell(0, 0, 'ZIP Codes', array('B'=>array('width' => .25)), 1);
 	$pdf->SetFont($font_index_rows[0], $font_index_rows[1], $font_index_rows[2]);
 	ksort($zip_codes);
+
+
 	foreach ($zip_codes as $zip => $pages) {
 		$pages = array_unique($pages);
 		$pdf->Cell($index_width * .35, 0, $zip, array('B'=>array('width' => .1)), 0);
 		$pdf->Cell($index_width * .65, 0, implode(', ', $pages), array('B'=>array('width' => .1)), 1, 'R');
 	}
+	*/
 
+ ob_end_clean();
 	$pdf->Output($_GET['size'] . '.pdf', 'I');
 
 	exit;
