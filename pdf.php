@@ -26,7 +26,7 @@ add_action('wp_ajax_pdf', function(){
 	$inch_converter			= 25.4; //25.4mm to an inch
 
 	$number_of_columns = 4;
-
+	$line_break = "<br>";
 	if ($_GET['size'] == 'letter') {
 		$table_padding		= 1.8; //in mm
 		$header_top			= 9;
@@ -79,25 +79,7 @@ add_action('wp_ajax_pdf', function(){
 	$page_threshold			= .5 * $inch_converter; //amount of space to start a new section
 	$index = $zip_codes		= array();
 
-	//main sections are here manually to preserve book order
-//	print "inside the pdf.php about to do regions array<br>";
-/*
-	$regions = array();
-	foreach (array(
-				"ma",
-				"me",
-				"nh",
-				"ri",
-				"vt"
-	) as $region) {
-		// live table: wp_8ngygs8ysn_terms
-		$region_id = $wpdb->get_var('SELECT term_id FROM wp_terms where name = "' . $region . '"');
-		if (!$region_id) die('could not find region with name ' . $region);
-		$regions[$region_id] = array();
-	}
-	*/
-//	print "finished the regions array thingie<br>";
-	//symbols used in the book, in the order in which they're applied
+
 	$symbols = array(
 		'*',   '^',   '#',   '!',   '+',   '@',   '%',
 		'**',  '^^',  '##',  '!!',  '++',  '@@',  '%%',
@@ -111,71 +93,97 @@ add_action('wp_ajax_pdf', function(){
 	//run function to attach meeting data to $regions
 	$meetings = attachPdfMeetingData();
 
+	// Extend the TCPDF class to create custom Header and Footer
+class MYPDF extends TCPDF {
+
+    //Page header
+    public function Header() {
+        // Logo http://localhost:8080/wp-content/uploads/2019/03/logo.png
+        $image_file = 'http://localhost:80/wp-content/uploads/2019/03/logo.png';
+        $this->Image('wp-content/uploads/2019/03/logo.png', 10, 10, 15, '', 'JPG', 'http://localhost:80', 'T', false, 300, '', false, false, 0, false, false, false);
+        // Set font
+        $this->SetFont('helvetica', 'B', 15);
+        // Title
+        $this->Cell(0, 15, 'SLAA NEI Meeting List', 0, false, 'C', 0, '', 0, false, 'M', 'B');
+    }
+
+    // Page footer
+    public function Footer() {
+        // Position at 15 mm from bottom
+        $this->SetY(-15);
+        // Set font
+        $this->SetFont('helvetica', 'I', 9);
+        // Page number
+        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    }
+}
+
+
+
+
 	//create new PDF
 	//$pdf = new MyTCPDF();
-	$pdf = new TCPDF("L", PDF_UNIT, "Letter", true, 'UTF-8', false);
+	$pdf = new MYPDF("L", PDF_UNIT, "Letter", true, 'UTF-8', false);
 	$pdf->SetFont('helvetica', '', 8);
 	//$pdf->SetAuthor('Nicola Asuni');
 	$pdf->SetTitle('SLAA NEI Meeting List');
-	//$pdf->SetSubject('TCPDF Tutorial');
-	//$pdf->SetAutoPageBreak(True, PDF_MARGIN_FOOTER);
 
+	// set auto page breaks
+	$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
+//logo  https://slaanei.org/wp-content/uploads/2019/02/logo.png
+//$header_html = '<img src="https://slaanei.org/wp-content/uploads/2019/02/logo.png" alt="logo" width="72" height="71"> SLAA NEI Meeting List';
+//$pdf->SetHeaderData("", 50, $header_html, "");
 
-	//get the current page
-	// getAliasNumPage  returns correct page, but seems to push value to strings already assigned
-	// getAliasNbPages returns total pages, can't cast to int, pushes value to already assigned strings
-	//PageNo integer, but only increments on manual page adds
-	//getPage (can cast to int but always returns 1)
-	function getStartPage($pdf){
-		return $pdf->PageNo();
-	}
-
-	function getEndPage($pdf){
-		return $pdf->getPage();
-	}
-
-	function getCurrentY($pdf){
-		return $pdf->getY();
-	}
-
-
+	$pdf->SetMargins(10, 15, 10, true);
+	$pdf->SetAutoPageBreak(TRUE, 10);
 	$pdf->AddPage();
-	$current_page = 1; //  getStartPage($pdf); //$pdf->PageNo();
-	//$pdf->Write(0, print_r($meetings), '', 0, 'L', true, 0, false, false, 0);
-	$current_day = "";
-	$this_column = "";
 
-	$column_number = 0;
 
+	// set intro
+	$intro_text = '
+	<table width="100%" cellspacing="2" cellpadding="2">
+<tbody>
+<tr>
+<td width="50%" align="right"><img
+src="https://slaanei.org/wp-content/uploads/2019/02/logo.png"
+alt="logo" width="77" height="76"><br>
+</td>
+<td align="left"><font size="+2">SLAA NEI<br>
+617-555-5555</font><br>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="center"><font size="+2">https://www.slaanei.org</font>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<font size="+1">Codes<br>
+C=Closed<br>
+O=Open<br>
+SP=Speaker<br>
+D=Discussion<br>
+ST=Step Study<br>
+LIT=Literature Study<br>
+FF=Fragrance Free<br>
+H=Handicap Accessible<br>
+</font>
+';
+
+$this_column .= $intro_text;
 
 	foreach ($meetings as $meeting){
 
-
-		//let's figure the height
-		$text_height = $pdf->getStringHeight($column_width, $this_column . $meeting['text'], true, false);
-	//	$this_column .= "text height:" . $text_height . "inner page height:" . $inner_page_height . "\n";
-		if($text_height > ($inner_page_height * .95) ){
-
-			//$this_column .= "\n had to make a new column\n";
-			//we need to write and make new column
-			$column_number += 1;
-			if($column_number > $number_of_columns){
-				//make new page and start over, for now, we'll end
-				$pdf->AddPage();
-				$current_page += 1;// getStartPage($pdf); //$pdf->PageNo();
-				$column_number = 0;
-			}
-			$pdf->MultiCell($column_width, 0, $this_column, 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
-			$this_column = "";
-		}elseif($meeting['formatted_day'] !== $current_day){
+		if($meeting['formatted_day'] !== $current_day){
 				$current_day = $meeting['formatted_day'];
 				//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
-				$this_column .= "\n------ " . $current_day . " -------\n";
+				$this_column .=  "<div align=\"center\"><font size=\"9\">========" . $current_day . "========</font></div>" ;
 
 		}else{
 			//add the divider
-			$this_column .= "---------------------\n";
+			$this_column .=  "<div align=\"center\">--------------------------</div>" ;
 		}
 
 
@@ -187,7 +195,14 @@ add_action('wp_ajax_pdf', function(){
 
 	}
 
-	$pdf->MultiCell($column_width, 0, $this_column, 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
+	$pdf->resetColumns();
+	$pdf->setEqualColumns($number_of_columns, $column_width);
+	$pdf->selectColumn();
+	$pdf->writeHTML($this_column, true, false, true, false, 'J');
+	//$pdf->Write(0, $this_column, '', 0, 'J', true, 0, false, true, 0);
+
+
+	// $pdf->MultiCell($column_width, 0, $this_column, 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
  //ob_end_clean();
 
 	$pdf->Output($_GET['size'] . '.pdf', 'I');
