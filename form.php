@@ -10,8 +10,9 @@ add_shortcode('pdf-form', function(){
 	}
 
 	return '
-	<h3>Generate PDF sucka</h3>
+	<h3>Generate PDF</h3>
 	<form method="get" class="form-horizontal" action="' . admin_url('admin-ajax.php') . '">
+	  <input type="hidden" name="action" value="pdf">
 	<fieldset>
 
 <!-- Form Name -->
@@ -21,18 +22,11 @@ add_shortcode('pdf-form', function(){
 <div class="form-group">
   <label class="col-md-4 control-label" for="header_text">Header title</label>
   <div class="col-md-6">
-  <input id="header_text" name="header_text" type="text" value="Blah AA Meeting Lisa" class="form-control input-md">
+  <input id="header_text" name="header_text" type="text" value="Blah AA Meeting" class="form-control input-md">
 
   </div>
 </div>
 
-<!-- Textarea -->
-<div class="form-group">
-  <label class="col-md-4 control-label" for="intro_html">Intro HTML</label>
-  <div class="col-md-4">
-    <textarea class="form-control" id="intro_html" name="intro_html">&lt;h1&gt;Thanks for looking at our list&lt;/h1&gt;</textarea>
-  </div>
-</div>
 
 <!-- Text input-->
 <div class="form-group">
@@ -83,13 +77,6 @@ add_shortcode('pdf-form', function(){
   </div>
 </div>
 
-<!-- Textarea -->
-<div class="form-group">
-  <label class="col-md-4 control-label" for="outtro_html">Text at end of List</label>
-  <div class="col-md-4">
-    <textarea class="form-control" id="outtro_html" name="outtro_html">&lt;h1&gt;thanks for looking at our list&lt;/h1&gt;</textarea>
-  </div>
-</div>
 
 <!-- Button -->
 <div class="form-group">

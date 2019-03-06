@@ -8,8 +8,6 @@ add_action('wp_ajax_pdf', function(){
 		auth_redirect();
 	} elseif (!current_user_can('edit_posts')) {
 		die('you do not have access to view this page');
-	} elseif (!isset($_GET['start']) || !isset($_GET['index']) || !isset($_GET['size'])) {
-		die('variables missing');
 	}
 
 	ini_set('max_execution_time', 60);
@@ -17,73 +15,37 @@ add_action('wp_ajax_pdf', function(){
 	/*
 			values from form:
 	header_text
-	intro_html
+
 	font_size
 	column_count
 	column_padding
 	outtro_html
 
 	*/
+//we are getting in function
+	//$header_text = $_GET['header_text'];
 
-	$header_text = $_GET['header_text'];
+	$margin_size = 10;
+	$font_size =  $_GET['font_size'];
+	$number_of_columns = $_GET['column_count'];
+	$column_padding = $_GET['column_padding'];
+	$page_width = 279.4; //11 inches
+	$page_height = 215.9; //8.5 inches
 
-	//config dimensions, in inches
-	$table_border_width		= .1;
+	//get column width
+$column_width = ($page_width -  (($number_of_columns-1) * $column_padding)  ) / $number_of_columns;
 
 	//convert dimensions to mm
 	$inch_converter			= 25.4; //25.4mm to an inch
 
-	$number_of_columns = 4;
-	$line_break = "<br>";
-	if ($_GET['size'] == 'letter') {
-		$table_padding		= 1.8; //in mm
-		$header_top			= 9;
-		$footer_bottom 		= -15;
-		$font_header			= array('helvetica', 'b', 18);
-		$font_footer			= array('helvetica', 'r', 10);
-		$font_table_header	= array('helvetica', 'b', 8);
-		$font_table_rows		= array('dejavusans', 'r', 6.4); //for the unicode character
-		$font_index_header	= array('helvetica', 'b', 9);
-		$font_index_rows		= array('helvetica', 'r', 6);
-		$margins = array(
-			'left'			=> .5,
-			'right'			=> .5,
-			'top'			=> .8, //include header
-			'bottom'			=> .5, //include footer
-		);
-		$page_width			= 11 * $inch_converter;
-		$page_height			= 8.5 * $inch_converter;
-		$line_height_ratio	= 2.87;
-		$index_width			= 57; // in mm
-		$table_gap			= .25 * $inch_converter; //gap between tables
-	} elseif ($_GET['size'] == 'book') {
-		$table_padding		= 1.4; //in mm
-		$header_top			= 6;
-		$footer_bottom 		= -10;
-		$font_header			= array('helvetica', 'b', 16);
-		$font_footer			= array('helvetica', 'r', 8);
-		$font_table_header	= array('helvetica', 'b', 6);
-		$font_table_rows		= array('dejavusans', 'r', 5.4); //for the unicode character
-		$font_index_header	= array('helvetica', 'b', 7);
-		$font_index_rows		= array('helvetica', 'r', 5.4);
-		$margins = array(
-			'left'				=> .25,
-			'right'				=> .25,
-			'top'				=> .65, //include header
-			'bottom'				=> .5, //include footer
-		);
-		$page_width			= 6.5 * $inch_converter;
-		$page_height			= 9.5 * $inch_converter;
-		$line_height_ratio	= 2.4;
-		$index_width			= 47; // in mm
-		$table_gap			= .2 * $inch_converter; //gap between tables
-	}
 
+	$line_break = "<br>";
 
 
 	//load libraries
 	require_once('vendor/autoload.php');
 	require_once('mytcpdf.php');
+	include 'intergroup-variables.php';
 
 	//run function to attach meeting data to $regions
 	$meetings = attachPdfMeetingData();
@@ -96,6 +58,7 @@ class MYPDF extends TCPDF {
         // Set font
         $this->SetFont('helvetica', 'B', 15);
         // Title
+				$header_text = $_GET['header_text'];
         $this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
     }
 
@@ -116,52 +79,20 @@ class MYPDF extends TCPDF {
 	//create new PDF
 	//$pdf = new MyTCPDF();
 	$pdf = new MYPDF("L", PDF_UNIT, "Letter", true, 'UTF-8', false);
-	$pdf->SetFont('helvetica', '', 8);
+	$pdf->SetFont('helvetica', '', $font_size);
 	$pdf->SetTitle('SLAA NEI Meeting List');
 
-	$pdf->SetMargins(10, 10, 10, true);
-	$pdf->SetAutoPageBreak(TRUE, 10);
+	$pdf->SetMargins($margin_size, $margin_size, $margin_size, true);
+	$pdf->SetAutoPageBreak(TRUE, $margin_size);
 	$pdf->AddPage();
 
 
 	// set intro
-	$intro_text = '
-	<table width="100%" cellspacing="2" cellpadding="2">
-<tbody>
-<tr>
-<td width="50%" align="right"><img
-src="https://slaanei.org/wp-content/uploads/2019/02/logo.png"
-alt="logo" width="77" height="76"><br>
-</td>
-<td align="left"><font size="+2">SLAA NEI<br>
-617-555-5555</font><br>
-</td>
-</tr>
-<tr>
-<td colspan="2" align="center"><font size="+2">https://www.slaanei.org</font>
-</td>
-</tr>
-</tbody>
-</table>
-<br>
-<font size="+1">Codes<br>
-C=Closed<br>
-O=Open<br>
-SP=Speaker<br>
-D=Discussion<br>
-ST=Step Study<br>
-LIT=Literature Study<br>
-FF=Fragrance Free<br>
-H=Handicap Accessible<br>
-</font>
-';
-
-$end_text = '
-<br>---------------------------------<br>
-Copyright ' . date('Y') . ' – New England Intergroup (NEI) of S.L.A.A. All rights reserved.
-';
 
 
+
+
+//$this_column .= $header_text;
 $this_column .= $intro_text;
 
 	foreach ($meetings as $meeting){
@@ -169,7 +100,7 @@ $this_column .= $intro_text;
 		if($meeting['formatted_day'] !== $current_day){
 				$current_day = $meeting['formatted_day'];
 				//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
-				$this_column .=  "<div align=\"center\"><font size=\"9\">========" . $current_day . "========</font></div>" ;
+				$this_column .=  "<div align=\"center\"><font size=\"+2\">========" . $current_day . "========</font></div>" ;
 
 		}else{
 			//add the divider
@@ -186,7 +117,7 @@ $this_column .= $intro_text;
 	}
 
 
-	$this_column .= $end_text;
+	$this_column .= $outtro_text;
 	$pdf->resetColumns();
 	$pdf->setEqualColumns($number_of_columns, $column_width);
 	$pdf->selectColumn();
