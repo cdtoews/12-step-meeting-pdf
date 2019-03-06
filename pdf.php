@@ -72,13 +72,14 @@ add_action('wp_ajax_pdf', function(){
 	foreach ($margins as $key => $value) $margins[$key] *= $inch_converter;
 	$inner_page_width		= $page_width - $margins['left'] - $margins['right'];
 	$inner_page_height		= $page_height - $margins['top'] - $margins['bottom'];
-	$first_column_width		= $inner_page_width * .37;
-	$day_column_width		= ($inner_page_width - $first_column_width) / 7;
+	$column_width		= $inner_page_width / 4;
+	//$day_column_width		= ($inner_page_width - $first_column_width) / 7;
 	$page_threshold			= .5 * $inch_converter; //amount of space to start a new section
 	$index = $zip_codes		= array();
 
 	//main sections are here manually to preserve book order
 //	print "inside the pdf.php about to do regions array<br>";
+/*
 	$regions = array();
 	foreach (array(
 				"ma",
@@ -87,10 +88,12 @@ add_action('wp_ajax_pdf', function(){
 				"ri",
 				"vt"
 	) as $region) {
-		$region_id = $wpdb->get_var('SELECT term_id FROM wp_8ngygs8ysn_terms where name = "' . $region . '"');
+		// live table: wp_8ngygs8ysn_terms
+		$region_id = $wpdb->get_var('SELECT term_id FROM wp_terms where name = "' . $region . '"');
 		if (!$region_id) die('could not find region with name ' . $region);
 		$regions[$region_id] = array();
 	}
+	*/
 //	print "finished the regions array thingie<br>";
 	//symbols used in the book, in the order in which they're applied
 	$symbols = array(
@@ -101,89 +104,24 @@ add_action('wp_ajax_pdf', function(){
 
 	//load libraries
 	require_once('vendor/autoload.php');
-
 	require_once('mytcpdf.php');
 
 	//run function to attach meeting data to $regions
-	$regions = attachPdfMeetingData($regions);
+	$meetings = attachPdfMeetingData();
 
 	//create new PDF
 	$pdf = new MyTCPDF();
+	//$pdf->SetAuthor('Nicola Asuni');
+	$pdf->SetTitle('SLAA NEI Meeting List');
+	//$pdf->SetSubject('TCPDF Tutorial');
+
 	$pdf->NewPage();
 
-	foreach ($regions as $region) {
-		//print "inside loop $region <br>";
-		$pdf->header = $region['name'];
+	foreach ($meetings as $meeting){
+		$pdf->Write(0, $meeting, '', 0, 'L', true, 0, false, false, 0);
+		$pdf->Write(0, '-----------------------------', '', 0, 'L', true, 0, false, false, 0);
 
-		/* let's not make a new page for each new region
-		$pdf->NewPage();
-		*/
-		if (!empty($region['sub_regions'])) {
-
-					//array_shift($region['sub_regions']);
-			foreach ($region['sub_regions'] as $sub_region => $rows) {
-
-				//create a new page if there's not enough space
-				if (($inner_page_height - $pdf->GetY()) < $page_threshold) {
-					$pdf->NewPage();
-				}
-
-				//draw rows
-				$pdf->drawTable($sub_region, $rows, $region['name']);
-
-				//draw a gap between tables if there's space
-				if (($inner_page_height - $pdf->GetY()) > $table_gap) {
-					$pdf->Ln($table_gap);
-				}
-
-				//break; //for debugging
-			}
-		} elseif ($region['rows']) {
-			$pdf->drawTable($region['name'], $region['rows'], $region['name']);
-		}
-
-		//break; //for debugging
 	}
-
-/* let's skip the index page
-	//index
-	ksort($index);
-	$pdf->header = 'Index';
-	$pdf->NewPage();
-	$pdf->SetEqualColumns(3, $index_width);
-	$pdf->SetCellPaddings(0, 1, 0, 1);
-	$index_output = '';
-
-	foreach ($index as $category => $rows) {
-
-		ksort($rows);
-		$pdf->SetFont($font_index_header[0], $font_index_header[1], $font_index_header[2]);
-		$pdf->Cell(0, 0, $category, array('B'=>array('width' => .25)), 1);
-		$pdf->SetFont($font_index_rows[0], $font_index_rows[1], $font_index_rows[2]);
-		foreach ($rows as $group => $page) {
-			if ($pos = strpos($group, ' #')) $group = substr($group, 0, $pos);
-			if (strlen($group) > 33) $group = substr($group, 0, 32) . '…';
-			$pdf->Cell($index_width * .88, 0, $group, array('B'=>array('width' => .1)), 0);
-			$pdf->Cell($index_width * .12, 0, $page, array('B'=>array('width' => .1)), 1, 'R');
-		}
-		$pdf->Ln(4);
-	}
-*/
-
-/* let's skip the zips
-	//zips are a little different, because page numbers is an array
-	$pdf->SetFont($font_index_header[0], $font_index_header[1], $font_index_header[2]);
-	$pdf->Cell(0, 0, 'ZIP Codes', array('B'=>array('width' => .25)), 1);
-	$pdf->SetFont($font_index_rows[0], $font_index_rows[1], $font_index_rows[2]);
-	ksort($zip_codes);
-
-
-	foreach ($zip_codes as $zip => $pages) {
-		$pages = array_unique($pages);
-		$pdf->Cell($index_width * .35, 0, $zip, array('B'=>array('width' => .1)), 0);
-		$pdf->Cell($index_width * .65, 0, implode(', ', $pages), array('B'=>array('width' => .1)), 1, 'R');
-	}
-	*/
 
  ob_end_clean();
 	$pdf->Output($_GET['size'] . '.pdf', 'I');

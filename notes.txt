@@ -1,0 +1,26 @@
+Array(
+[id] => 3761
+[name] => Sunset Meeting
+[slug] => sunset - meeting
+[notes] =>
+[updated] => 2019 - 03 - 05 22: 37: 34
+[location_id] => 3760
+[url] => https: //slaanei.org/schedule/sunset-meeting
+[time] => 16:00
+[end_time] =>
+[time_formatted] => 4:00 pm
+[distance] =>
+[day] => 0
+[types] => Array (
+[0] => C
+[1] => D
+[2] => ST )
+[location] => Church of the Good Shepherd
+[location_notes] => Meeting in rear of church
+[location_url] => https://slaanei.org/locations/church-of-the-good-shepherd
+[formatted_address] => 74 High St, Wareham, MA 02571, USA
+[latitude] => 41.7565882
+[longitude] => -70.7162661
+[region_id] => 236
+[region] => MA
+[sub_region] => )
