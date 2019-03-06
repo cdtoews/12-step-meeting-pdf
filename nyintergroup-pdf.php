@@ -31,10 +31,10 @@ function decode_types($type) {
 
 //pdf function to get data and attach it to the regions array
 function attachPdfMeetingData() {
-	global $symbols;
+//	global $symbols;
 
 	//going to be checking this over and over
-	$count_symbols = count($symbols);
+//	$count_symbols = count($symbols);
 
 /*
 	//get all the sub-regions and their children

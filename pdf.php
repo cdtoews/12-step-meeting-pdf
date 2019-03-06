@@ -25,6 +25,8 @@ add_action('wp_ajax_pdf', function(){
 	//convert dimensions to mm
 	$inch_converter			= 25.4; //25.4mm to an inch
 
+	$number_of_columns = 4;
+
 	if ($_GET['size'] == 'letter') {
 		$table_padding		= 1.8; //in mm
 		$header_top			= 9;
@@ -41,8 +43,8 @@ add_action('wp_ajax_pdf', function(){
 			'top'			=> .8, //include header
 			'bottom'			=> .5, //include footer
 		);
-		$page_width			= 8.5 * $inch_converter;
-		$page_height			= 11 * $inch_converter;
+		$page_width			= 11 * $inch_converter;
+		$page_height			= 8.5 * $inch_converter;
 		$line_height_ratio	= 2.87;
 		$index_width			= 57; // in mm
 		$table_gap			= .25 * $inch_converter; //gap between tables
@@ -110,28 +112,109 @@ add_action('wp_ajax_pdf', function(){
 	$meetings = attachPdfMeetingData();
 
 	//create new PDF
-	$pdf = new MyTCPDF();
+	//$pdf = new MyTCPDF();
+	$pdf = new TCPDF("L", PDF_UNIT, "Letter", true, 'UTF-8', false);
+	$pdf->SetFont('helvetica', '', 8);
 	//$pdf->SetAuthor('Nicola Asuni');
 	$pdf->SetTitle('SLAA NEI Meeting List');
 	//$pdf->SetSubject('TCPDF Tutorial');
+	//$pdf->SetAutoPageBreak(True, PDF_MARGIN_FOOTER);
 
-	$pdf->NewPage();
+	//get the current page
+	// getAliasNumPage  returns correct page, but seems to push value to strings already assigned
+	// getAliasNbPages returns total pages, can't cast to int, pushes value to already assigned strings
+	//PageNo integer, but only increments on manual page adds
+	//getPage (can cast to int but always returns 1)
+	function getStartPage($pdf){
+		return $pdf->PageNo();
+	}
+
+	function getEndPage($pdf){
+		return $pdf->getPage();
+	}
+
+	function getCurrentY($pdf){
+		return $pdf->getY();
+	}
+
+
+	$pdf->AddPage();
+	$current_page =  getStartPage($pdf); //$pdf->PageNo();
 	//$pdf->Write(0, print_r($meetings), '', 0, 'L', true, 0, false, false, 0);
 	$current_day = "";
-	foreach ($meetings as $meeting){
-		//lets check if we have a new day
+	$this_column = "";
+	$test1 = 1;
+	$test2 = ' 1 ';
+	if($test1 == $test2){
+		$this_column .= "test 1 and 2 are equal\n";
+	}else{
+		$this_column .= "test 1 and 2 are NOT equal\n";
+	}
+	$this_column .= "intvalue of test2:" . intval($test2) . "\n";
 
-		if($meeting['formatted_day'] !== $current_day){
-			$current_day = $meeting['formatted_day'];
-			$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
+
+
+
+	$column_number = 0;
+
+
+	foreach ($meetings as $meeting){
+
+		//see if we go off the page if we add the next meeting
+		$startingY = getCurrentY($pdf);
+		$this_column .= "startingY:" . $startingY . " inner page height:" . $inner_page_height . "\n";
+		//$this_column .= "\ncurent page:" . $current_page . " type:" . gettype($current_page) . " intval:" . intval($current_page) . "\n";
+		$pdf->startTransaction();
+
+
+			$pdf->MultiCell($column_width, 0, $this_column . $meeting['text'] , 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
+			$endingY = getCurrentY($pdf);
+			$this_column .= "endingY:" . $endingY . " inner page height:" . $inner_page_height . "\n";
+			//$ending_page =   getEndPage($pdf); //$pdf->PageNo();
+			//settype($ending_page, "integer");
+			//$this_column .= "y diff:" . ($endingY - $startingY);
+			//$this_column .= "endpage:'" . $ending_page . "' type:" . gettype($ending_page) . " intval:" . intval($ending_page) . "\n";
+		$pdf = $pdf->rollbackTransaction();
+
+		//for debugging
+		//$this_column .= "\n start page:" . $start_page . " endpage:" . $ending_page . " column number:" . $column_number . "\n";
+
+
+		if($endingY > $inner_page_height){
+
+			$this_column .= "\n had to make a new column\n";
+			//we need to write and make new column
+			$column_number += 1;
+			if($column_number > $number_of_columns){
+				//make new page and start over, for now, we'll end
+				$pdf->AddPage();
+				$current_page =   getStartPage($pdf); //$pdf->PageNo();
+				$column_number = 0;
+			}
+			$pdf->MultiCell($column_width, 0, $this_column, 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
+			$this_column = "";
+		}elseif($meeting['formatted_day'] !== $current_day){
+				$current_day = $meeting['formatted_day'];
+				//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
+				$this_column .= "\n------ " . $current_day . " -------\n";
+
+		}else{
+			//add the divider
+			$this_column .= "\n---------------------\n";
 		}
 
-		$pdf->Write(0, $meeting['text'], '', 0, 'L', true, 0, false, false, 0);
-		$pdf->Write(0, '-----------------------------', '', 0, 'L', true, 0, false, false, 0);
+
+
+		$this_column .= $meeting['text'] ;
+		// $pdf->Write(0, $meeting['text'], '', 0, 'L', true, 0, false, false, 0);
+		// $pdf->Write(0, '-----------------------------', '', 0, 'L', true, 0, false, false, 0);
+
 
 	}
 
- ob_end_clean();
+	$pdf->MultiCell($column_width, 0, $this_column, 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
+ //ob_end_clean();
+
 	$pdf->Output($_GET['size'] . '.pdf', 'I');
 
 	exit;
