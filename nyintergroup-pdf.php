@@ -197,23 +197,52 @@ function attachPdfMeetingData() {
 	foreach ($meetings as $meeting) {
 			@$parts = explode(', ', $meeting['formatted_address']);
 
+			$day = $meeting['day'];
+			$formatted_day = "";
+			if($day == 0){
+				$formatted_day = "Sunday";
+			}elseif ($day == 1){
+				$formatted_day = "Monday";
+			}elseif ($day == 2){
+				$formatted_day = "Tuesday";
+			}elseif ($day == 3){
+				$formatted_day = "Wednesday";
+			}elseif ($day == 4){
+				$formatted_day = "Thursday";
+			}elseif ($day == 5){
+				$formatted_day = "Friday";
+			}elseif ($day == 6){
+				$formatted_day = "Saturday";
+			}else{
+				$formatted_day = "Unknown Day";
+			}
 
-			$thismeeting = "";
-			$thismeeting .= $meeting['region'] . " ";
-			$thismeeting .= $meeting['sub_region'] . ", ";
-			$thismeeting .= $meeting['time_formatted'] . ", ";
-			$thismeeting .= "(" . implode (',' , $meeting['types']) . ") ";
-			$thismeeting .= $meeting['name'] . ". ";
-			$thismeeting .= $meeting['location'] . ". ";
-			$thismeeting .= @$parts[0] . ". ";
-			$thismeeting .= $meeting['notes'] . ". ";
-			$thismeeting .= $meeting['location_notes'] . ". ";
+			$meetingtext = "";
+			$meetingtext .= $meeting['region'] . " ";
+			$meetingtext .= $meeting['sub_region'] . ", ";
+			$meetingtext .= $meeting['time_formatted'] . ", ";
+			$meetingtext .= "(" . implode (',' , $meeting['types']) . ") ";
+			$meetingtext .= $meeting['name'] . ". ";
+			$meetingtext .= $meeting['location'] . ". ";
+			$meetingtext .= @$parts[0] . ". ";
+			$meetingtext .= $meeting['notes'] . ". ";
+			$meetingtext .= $meeting['location_notes'] . ". ";
 
 			//let's strip carriage returns and tables
-			$thismeeting = str_replace("\r", "", $thismeeting);
-			$thismeeting = str_replace("\n", "", $thismeeting);
-			$thismeeting = str_replace("\t", "", $thismeeting);
+			$meetingtext = str_replace("\r", "", $meetingtext);
+			$meetingtext = str_replace("\n", "", $meetingtext);
+			$meetingtext = str_replace("\t", "", $meetingtext);
 
+			$thismeeting = array(
+					'text' => $meetingtext,
+					'day' => $meeting['day'],
+					'formatted_day' => $formatted_day
+
+			);
+
+
+
+		//	$cellcontents[] = $thismeeting;
 			array_push($cellcontents, $thismeeting);
 	}
 

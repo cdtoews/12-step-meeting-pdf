@@ -116,9 +116,17 @@ add_action('wp_ajax_pdf', function(){
 	//$pdf->SetSubject('TCPDF Tutorial');
 
 	$pdf->NewPage();
-
+	//$pdf->Write(0, print_r($meetings), '', 0, 'L', true, 0, false, false, 0);
+	$current_day = "";
 	foreach ($meetings as $meeting){
-		$pdf->Write(0, $meeting, '', 0, 'L', true, 0, false, false, 0);
+		//lets check if we have a new day
+
+		if($meeting['formatted_day'] !== $current_day){
+			$current_day = $meeting['formatted_day'];
+			$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
+		}
+
+		$pdf->Write(0, $meeting['text'], '', 0, 'L', true, 0, false, false, 0);
 		$pdf->Write(0, '-----------------------------', '', 0, 'L', true, 0, false, false, 0);
 
 	}
