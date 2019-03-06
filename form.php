@@ -12,41 +12,94 @@ add_shortcode('pdf-form', function(){
 	return '
 	<h3>Generate PDF</h3>
 	<form method="get" class="form-horizontal" action="' . admin_url('admin-ajax.php') . '">
-		<input type="hidden" name="action" value="pdf">
-		<div class="form-group">
-			<label for="start" class="col-sm-3 control-label">Starting Page Number</label>
-			<div class="col-sm-9">
-				<select class="form-control" name="start" id="start">' .
-					implode(array_map(function($i){
-						return '<option value="' . $i . '">' . $i . '</option>';
-					}, range(1, 26))) .
-				'</select>
-			</div>
-		</div>
-		<div class="form-group">
-			<label for="index" class="col-sm-3 control-label">Show Index for Types</label>
-			<div class="col-sm-9">
-				<select class="form-control" name="index" id="index">
-					<option value="yes" selected>Yes</option>
-					<option value="no">No</option>
-				</select>
-			</div>
-		</div>
-		<div class="form-group">
-			<label for="index" class="col-sm-3 control-label">Paper Size</label>
-			<div class="col-sm-9">
-				<div class="radio">
-					<label><input type="radio" name="size" value="letter" checked>US Letter (8.5&times;11")</label>
-				</div>
-				<div class="radio">
-					<label><input type="radio" name="size" value="book">Meeting Book (6.5&times;9.5")</label>
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-sm-9 col-sm-offset-3">
-				<button class="btn btn-primary" type="submit">Generate PDF</button>
-			</div>
-		</div>
-	</form>';
+	<fieldset>
+
+<!-- Form Name -->
+<legend>Form Name</legend>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="header_text">Header title</label>
+  <div class="col-md-6">
+  <input id="header_text" name="header_text" type="text" value="Blah AA Meeting Lisa" class="form-control input-md">
+
+  </div>
+</div>
+
+<!-- Textarea -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="intro_html">Intro HTML</label>
+  <div class="col-md-4">
+    <textarea class="form-control" id="intro_html" name="intro_html">&lt;h1&gt;Thanks for looking at our list&lt;/h1&gt;</textarea>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="font_size">Font Size</label>
+  <div class="col-md-2">
+  <input id="font_size" name="font_size" type="text" value="8" class="form-control input-md">
+
+  </div>
+</div>
+
+<!-- Multiple Radios (inline) -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="column_count">Column count</label>
+  <div class="col-md-4">
+    <label class="radio-inline" for="column_count-0">
+      <input type="radio" name="column_count" id="column_count-0" value="1" checked="checked">
+      1
+    </label>
+    <label class="radio-inline" for="column_count-1">
+      <input type="radio" name="column_count" id="column_count-1" value="2">
+      2
+    </label>
+    <label class="radio-inline" for="column_count-2">
+      <input type="radio" name="column_count" id="column_count-2" value="3">
+      3
+    </label>
+    <label class="radio-inline" for="column_count-3">
+      <input type="radio" name="column_count" id="column_count-3" value="4">
+      4
+    </label>
+    <label class="radio-inline" for="column_count-4">
+      <input type="radio" name="column_count" id="column_count-4" value="5">
+      5
+    </label>
+    <label class="radio-inline" for="column_count-5">
+      <input type="radio" name="column_count" id="column_count-5" value="6">
+      6
+    </label>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="column_padding">Column Padding</label>
+  <div class="col-md-4">
+  <input id="column_padding" name="column_padding" type="text" value="5" class="form-control input-md">
+  <span class="help-block">padding between columns</span>
+  </div>
+</div>
+
+<!-- Textarea -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="outtro_html">Text at end of List</label>
+  <div class="col-md-4">
+    <textarea class="form-control" id="outtro_html" name="outtro_html">&lt;h1&gt;thanks for looking at our list&lt;/h1&gt;</textarea>
+  </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="submit"></label>
+  <div class="col-md-4">
+    <button id="submit" name="submit" class="btn btn-primary">Generate PDF</button>
+  </div>
+</div>
+
+</fieldset>
+</form>
+	';
 });

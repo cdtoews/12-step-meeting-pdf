@@ -14,10 +14,18 @@ add_action('wp_ajax_pdf', function(){
 
 	ini_set('max_execution_time', 60);
 
-	//output PDF of NYC meeting list using the TCPDF library
+	/*
+			values from form:
+	header_text
+	intro_html
+	font_size
+	column_count
+	column_padding
+	outtro_html
 
-	//don't show these in indexes
-	$exclude_from_indexes	= array('Beginner', 'Candlelight', 'Closed', 'Grapevine', 'Literature', 'Open', 'Topic Discussion');
+	*/
+
+	$header_text = $_GET['header_text'];
 
 	//config dimensions, in inches
 	$table_border_width		= .1;
@@ -71,20 +79,7 @@ add_action('wp_ajax_pdf', function(){
 		$table_gap			= .2 * $inch_converter; //gap between tables
 	}
 
-	foreach ($margins as $key => $value) $margins[$key] *= $inch_converter;
-	$inner_page_width		= $page_width - $margins['left'] - $margins['right'];
-	$inner_page_height		= $page_height - $margins['top'] - $margins['bottom'];
-	$column_width		= $inner_page_width / 4;
-	//$day_column_width		= ($inner_page_width - $first_column_width) / 7;
-	$page_threshold			= .5 * $inch_converter; //amount of space to start a new section
-	$index = $zip_codes		= array();
 
-
-	$symbols = array(
-		'*',   '^',   '#',   '!',   '+',   '@',   '%',
-		'**',  '^^',  '##',  '!!',  '++',  '@@',  '%%',
-		'***', '^^^', '###', '!!!', '+++', '@@@', '%%%',
-	);
 
 	//load libraries
 	require_once('vendor/autoload.php');
@@ -98,13 +93,10 @@ class MYPDF extends TCPDF {
 
     //Page header
     public function Header() {
-        // Logo http://localhost:8080/wp-content/uploads/2019/03/logo.png
-        $image_file = 'http://localhost:80/wp-content/uploads/2019/03/logo.png';
-        $this->Image('wp-content/uploads/2019/03/logo.png', 10, 10, 15, '', 'JPG', 'http://localhost:80', 'T', false, 300, '', false, false, 0, false, false, false);
         // Set font
         $this->SetFont('helvetica', 'B', 15);
         // Title
-        $this->Cell(0, 15, 'SLAA NEI Meeting List', 0, false, 'C', 0, '', 0, false, 'M', 'B');
+        $this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
     }
 
     // Page footer
@@ -125,17 +117,9 @@ class MYPDF extends TCPDF {
 	//$pdf = new MyTCPDF();
 	$pdf = new MYPDF("L", PDF_UNIT, "Letter", true, 'UTF-8', false);
 	$pdf->SetFont('helvetica', '', 8);
-	//$pdf->SetAuthor('Nicola Asuni');
 	$pdf->SetTitle('SLAA NEI Meeting List');
 
-	// set auto page breaks
-	$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-//logo  https://slaanei.org/wp-content/uploads/2019/02/logo.png
-//$header_html = '<img src="https://slaanei.org/wp-content/uploads/2019/02/logo.png" alt="logo" width="72" height="71"> SLAA NEI Meeting List';
-//$pdf->SetHeaderData("", 50, $header_html, "");
-
-	$pdf->SetMargins(10, 15, 10, true);
+	$pdf->SetMargins(10, 10, 10, true);
 	$pdf->SetAutoPageBreak(TRUE, 10);
 	$pdf->AddPage();
 
@@ -172,6 +156,12 @@ H=Handicap Accessible<br>
 </font>
 ';
 
+$end_text = '
+<br>---------------------------------<br>
+Copyright ' . date('Y') . ' – New England Intergroup (NEI) of S.L.A.A. All rights reserved.
+';
+
+
 $this_column .= $intro_text;
 
 	foreach ($meetings as $meeting){
@@ -195,6 +185,8 @@ $this_column .= $intro_text;
 
 	}
 
+
+	$this_column .= $end_text;
 	$pdf->resetColumns();
 	$pdf->setEqualColumns($number_of_columns, $column_width);
 	$pdf->selectColumn();

@@ -24,3 +24,5 @@ Array(
 [region_id] => 236
 [region] => MA
 [sub_region] => )
+
+MA. STOUGHTON, 7:00 PM (CL,h) Going to Any Lengths. First Congregational Church, 76 Pierce Street. Enter church through left door down ramp. Rm 5 is straight ahead. If you're struggling with this addiction, pl join us.
