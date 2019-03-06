@@ -10,7 +10,7 @@ add_shortcode('pdf-form', function(){
 	}
 
 	return '
-	<h3>Generate PDF</h3>
+	<h3>Generate PDF sucka</h3>
 	<form method="get" class="form-horizontal" action="' . admin_url('admin-ajax.php') . '">
 	<fieldset>
 
