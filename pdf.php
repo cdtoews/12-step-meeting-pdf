@@ -1,6 +1,6 @@
 <?php
 
-add_action('wp_ajax_pdf', function(){
+add_action('wp_ajax_step_pdf', function(){
 	global $wpdb, $margins, $font_table_rows, $page_width, $page_height, $table_padding, $font_header, $header_top, $font_footer, $footer_bottom, $first_column_width, $table_border_width, $font_table_rows, $table_padding, $font_table_header, $first_column_width, $day_column_width, $table_border_width, $font_table_rows, $table_padding, $first_column_width, $day_column_width, $table_border_width, $inner_page_height, $font_table_rows, $index, $exclude_from_indexes, $zip_codes, $table_padding, $line_height_ratio;
 
 	//must be a logged-in user to run this page (otherwise last_contact will be null)

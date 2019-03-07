@@ -1,6 +1,6 @@
 <?php
 
-add_shortcode('pdf-form', function(){
+add_shortcode('meeting-pdf-form', function(){
 
 	//security
 	if (!is_user_logged_in()) {
@@ -12,7 +12,7 @@ add_shortcode('pdf-form', function(){
 	return '
 	<h3>Generate PDF</h3>
 	<form method="get" class="form-horizontal" action="' . admin_url('admin-ajax.php') . '">
-	  <input type="hidden" name="action" value="pdf">
+	  <input type="hidden" name="action" value="step_pdf">
 	<fieldset>
 
 <!-- Form Name -->

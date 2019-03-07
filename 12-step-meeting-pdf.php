@@ -2,7 +2,25 @@
 
 /**
  * Plugin Name: 12 Step Meeting PDF
+ * Plugin URI: *
+ * Description: Create PDF meeting list from the 12 Ste Meeting List Plugin
+ * code forked from https://github.com/meeting-guide/nyintergroup
+ * Version: 0.0.1
+ * Author: Chris Toews
+ * Author URI: https://yourtechguys.info
+ * Text Domain: 12-step-meeting-pdf
  */
+
+ if (!defined('GROUP_CONTACT_COUNT')) define('GROUP_CONTACT_COUNT', 3);
+ if (!defined('TSMP_CONTACT_EMAIL')) define('TSMP_CONTACT_EMAIL', 'chris@yourtechguys.info');
+ if (!defined('TSMP_PATH')) define('TSMP_PATH', plugin_dir_path(__FILE__));
+ if (!defined('TSMP_VERSION')) define('TSML_VERSION', '0.0.1');
+
+
+ //include admin files
+ if (is_admin()) {
+ 	include(TSMP_PATH . '/includes/admin_menu.php');
+ }
 
 //generates form from shortcode
 include('form.php');
