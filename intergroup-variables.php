@@ -1,3 +1,0 @@
-<?php
-
-$intro_text = '';
