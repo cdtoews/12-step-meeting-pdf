@@ -25,7 +25,7 @@ add_action('wp_ajax_pdf', function(){
 //we are getting in function
 	//$header_text = $_GET['header_text'];
 
-	$margin_size = 10;
+	$margin_size = $_GET['margin'];
 	$font_size =  $_GET['font_size'];
 	$number_of_columns = $_GET['column_count'];
 	$column_padding = $_GET['column_padding'];
@@ -65,11 +65,11 @@ class MYPDF extends TCPDF {
     // Page footer
     public function Footer() {
         // Position at 15 mm from bottom
-        $this->SetY(-15);
+        // $this->SetY(-15);
         // Set font
-        $this->SetFont('helvetica', 'I', 9);
+        // $this->SetFont('helvetica', 'I', 9);
         // Page number
-        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+        // $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }
 
@@ -128,7 +128,7 @@ $this_column .= $intro_text;
 	// $pdf->MultiCell($column_width, 0, $this_column, 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
  //ob_end_clean();
 
-	$pdf->Output($_GET['size'] . '.pdf', 'I');
+	$pdf->Output('meeting_list.pdf', 'I');
 
 	exit;
 });

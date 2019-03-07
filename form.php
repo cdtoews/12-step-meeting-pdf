@@ -35,6 +35,15 @@ add_shortcode('pdf-form', function(){
   <input id="font_size" name="font_size" type="text" value="8" class="form-control input-md">
 
   </div>
+
+	<!-- Text input-->
+	<div class="form-group">
+	  <label class="col-md-4 control-label" for="margin">margin</label>
+	  <div class="col-md-2">
+	  <input id="margin" name="margin" type="text" value="10" class="form-control input-md">
+
+	  </div>
+
 </div>
 
 <!-- Multiple Radios (inline) -->
