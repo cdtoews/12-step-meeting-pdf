@@ -25,10 +25,36 @@ add_action('wp_ajax_pdf', function(){
 //we are getting in function
 	//$header_text = $_GET['header_text'];
 
-	$margin_size = $_GET['margin'];
-	$font_size =  $_GET['font_size'];
-	$number_of_columns = $_GET['column_count'];
-	$column_padding = $_GET['column_padding'];
+	if (isset($_GET['margin'])) {
+		$margin_size = $_GET['margin'];
+	}else{
+		$margin_size = 10;
+	}
+
+	if (isset($_GET['font_size'])) {
+		$font_size = $_GET['font_size'];
+	}else{
+		$font_size = 8;
+	}
+
+	if (isset($_GET['column_count'])) {
+		$number_of_columns = $_GET['column_count'];
+	}else{
+		$number_of_columns = 4;
+	}
+
+	if (isset($_GET['column_padding'])) {
+		$column_padding = $_GET['column_padding'];
+	}else{
+		$column_padding = 5;
+	}
+
+
+
+
+
+
+
 	$page_width = 279.4; //11 inches
 	$page_height = 215.9; //8.5 inches
 
@@ -55,11 +81,17 @@ class MYPDF extends TCPDF {
 
     //Page header
     public function Header() {
-        // Set font
-        $this->SetFont('helvetica', 'B', 15);
-        // Title
+
+			if (isset($_GET['header_text'])) {
+				// Set font
+				$this->SetFont('helvetica', 'B', 15);
+				// Title
+
 				$header_text = $_GET['header_text'];
-        $this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
+				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
+			}
+
+
     }
 
     // Page footer
@@ -90,7 +122,8 @@ class MYPDF extends TCPDF {
 	// set intro
 
 
-
+$this_column = "";
+$current_day = "";
 
 //$this_column .= $header_text;
 $this_column .= $intro_text;
