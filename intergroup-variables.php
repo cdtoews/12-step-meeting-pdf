@@ -2,8 +2,6 @@
 
 $intro_text = '';
 
-
-
 $outtro_text = '
 <div align="center"><font size="-2"><b>Meeting Symbols – What do
 they Mean?</b><br>
