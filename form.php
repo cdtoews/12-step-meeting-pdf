@@ -44,6 +44,14 @@ add_shortcode('pdf-form', function(){
 
 	  </div>
 
+		<!-- Text input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="cover_post_id">Post/Page ID containing HTML for pdf</label>
+			<div class="col-md-2">
+			<input id="cover_post_id" name="cover_post_id" type="text" class="form-control input-md">
+
+			</div>
+
 </div>
 
 <!-- Multiple Radios (inline) -->

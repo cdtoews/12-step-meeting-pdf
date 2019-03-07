@@ -49,10 +49,14 @@ add_action('wp_ajax_pdf', function(){
 		$column_padding = 5;
 	}
 
-
-
-
-
+	if (isset($_GET['cover_post_id'])) {
+		$post_id = $_GET['cover_post_id'];
+		$queried_post = get_post($post_id);
+		$post_content = $queried_post->post_content;
+		$outtro_text = $post_content;
+	}else{
+		$outtro_text = "";
+	}
 
 
 	$page_width = 279.4; //11 inches
