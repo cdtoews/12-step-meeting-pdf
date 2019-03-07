@@ -74,8 +74,7 @@ $column_width = ($page_width -  (($number_of_columns-1) * $column_padding)  ) / 
 
 	//load libraries
 	require_once('vendor/autoload.php');
-	require_once('mytcpdf.php');
-	include 'intergroup-variables.php';
+	//require_once('mytcpdf.php');
 
 	//run function to attach meeting data to $regions
 	$meetings = attachPdfMeetingData();
