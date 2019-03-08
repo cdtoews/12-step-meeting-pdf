@@ -2,6 +2,48 @@
 
 add_action('admin_menu', 'tsmp_admin_menu');
 
+
+add_action('admin_init', 'tsmp_options_init' );
+    function tsmp_options_init(){
+      register_setting( 'tsmp-settings-group', 'tsmp_header', array(
+                                        'type' => 'string',
+                                        'default' => 'Some Group Meeting List',
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_margin' , array(
+                                        'type' => 'integer',
+                                        'default' => 10,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_intro_html', array(
+                                        'type' => 'string',
+                                        'default' => '<h1>Our Meeting List</h1>',
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_font_size', array(
+                                        'type' => 'number',
+                                        'default' => 7.6,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_column_count', array(
+                                        'type' => 'integer',
+                                        'default' => 4,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_column_padding', array(
+                                        'type' => 'integer',
+                                        'default' => 5,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_outtro_html', array(
+                                        'type' => 'string',
+                                        'default' => '<h1>Thanks for Looking</h1>',
+                                        )
+                        );
+    }
+
+
+
 function tsmp_admin_menu() {
 
   // check user capabilities
@@ -9,6 +51,7 @@ function tsmp_admin_menu() {
       return;
   }
 
+/*
   //set the options and defaults if they don't exist
   if(!get_option('tsmp_header')){
       update_option('tsmp_header', 'AA Meeting of Somewhere');
@@ -37,6 +80,10 @@ function tsmp_admin_menu() {
   if(!get_option('tsmp_outtro_html')){
       update_option('tsmp_outtro_html', '<h2>Thanks for looking at our meetings</h2><br><img src="https://cdn.psychologytoday.com/sites/default/files/blogs/1023/2010/12/52630-43316.jpg">');
   }
+
+*/
+//let's register tsml_get_meetings
+
 
 
 
