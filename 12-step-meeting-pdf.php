@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: 12 Step Meeting PDF Generator
- * Plugin URI: *
+ * Plugin URI: https://github.com/cdtoews/12-step-meeting-pdf
  * Description: Create PDF meeting list from the 12 Step Meeting List Plugin
  * code forked from https://github.com/meeting-guide/nyintergroup
  * Version: 0.1.0
@@ -87,7 +87,7 @@
 
 
 
-		//put this meeting in array 
+		//put this meeting in array
 			array_push($cellcontents, $thismeeting);
 	}
 
