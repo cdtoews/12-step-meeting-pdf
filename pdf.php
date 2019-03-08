@@ -9,7 +9,7 @@ add_action('wp_ajax_step_pdf', function(){
 	} elseif (!current_user_can('edit_posts')) {
 		die('you do not have access to view this page');
 	}
-
+ ob_start();
 	ini_set('max_execution_time', 60);
 
 	/*
@@ -25,38 +25,17 @@ add_action('wp_ajax_step_pdf', function(){
 //we are getting in function
 	//$header_text = $_GET['header_text'];
 
-	if (isset($_GET['margin'])) {
-		$margin_size = $_GET['margin'];
-	}else{
-		$margin_size = 10;
-	}
+settings_fields('tsmp-settings-group');
+do_settings_sections( 'tsmp-settings-group' );
 
-	if (isset($_GET['font_size'])) {
-		$font_size = $_GET['font_size'];
-	}else{
-		$font_size = 8;
-	}
+//need to add variable validation for mortals
+$margin_size = get_option('tsmp_margin');
+$font_size = get_option('tsmp_font_size');
+$number_of_columns = get_option('tsmp_column_count');
+$column_padding = get_option('tsmp_column_padding');
+$outtro_text = get_option('tsmp_outtro_html');
+$intro_text = get_option('tsmp_intro_html');
 
-	if (isset($_GET['column_count'])) {
-		$number_of_columns = $_GET['column_count'];
-	}else{
-		$number_of_columns = 4;
-	}
-
-	if (isset($_GET['column_padding'])) {
-		$column_padding = $_GET['column_padding'];
-	}else{
-		$column_padding = 5;
-	}
-
-	if (isset($_GET['cover_post_id'])) {
-		$post_id = $_GET['cover_post_id'];
-		$queried_post = get_post($post_id);
-		$post_content = $queried_post->post_content;
-		$outtro_text = $post_content;
-	}else{
-		$outtro_text = "";
-	}
 
 
 	$page_width = 279.4; //11 inches
@@ -84,13 +63,14 @@ class MYPDF extends TCPDF {
 
     //Page header
     public function Header() {
+			$header_text = get_option('tsmp_header');
 
-			if (isset($_GET['header_text'])) {
+			if ($header_text != "") {
 				// Set font
 				$this->SetFont('helvetica', 'B', 15);
 				// Title
 
-				$header_text = $_GET['header_text'];
+
 				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
 			}
 
@@ -162,7 +142,7 @@ $this_column .= $intro_text;
 
 
 	// $pdf->MultiCell($column_width, 0, $this_column, 1, 'L', 0, 0, '', '', true, 0, false, true, 0);
- //ob_end_clean();
+ ob_end_clean();
 
 	$pdf->Output('meeting_list.pdf', 'I');
 

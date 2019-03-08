@@ -43,12 +43,36 @@ function tsmp_gen_page() {
                </tr>
 
            </table>
-           column count : <?php echo get_option('tsmp_column_count'); ?><br>
+
+<?php
+//for debugging
+if(1==2){
+  echo "tsmp_column_padding :" .  get_option('tsmp_column_padding') . "<br>";
+  echo "tsmp_column_count :" .  get_option('tsmp_column_count') . "<br>";
+  echo "tsmp_margin :" .  get_option('tsmp_margin') . "<br>";
+  echo "tsmp_font_size :" .  get_option('tsmp_font_size') . "<br>";
+  echo "tsmp_header :" .  get_option('tsmp_header') . "<br>";
+  echo "tsmp_intro_html :" .  get_option('tsmp_intro_html') . "<br>";
+  echo "tsmp_outtro_html :" .  get_option('tsmp_outtro_html') . "<br>";
+
+}
+
+
+?>
+
+
        <p class="submit">
            <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
            </p>
        </form>
    </div>
+   After saving values above<br>
+  <form method="get" class="form-horizontal" action="admin-ajax.php">
+     <input name="action" value="step_pdf" type="hidden">
+<div class="form-group"> <label class="col-md-4 control-label" for="submit"></label>
+<div class="col-md-4"> <button id="submit"
+name="submit" class="btn btn-primary">Generate PDF</button>
+</form>
   <?php
 
 }
