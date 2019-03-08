@@ -5,15 +5,21 @@
  * Plugin URI: *
  * Description: Create PDF meeting list from the 12 Step Meeting List Plugin
  * code forked from https://github.com/meeting-guide/nyintergroup
- * Version: 0.0.3
+ * Version: 0.1.0
  * Author: Chris Toews
  * Author URI: https://yourtechguys.info
  * Text Domain: 12-step-meeting-pdf
  */
 
+ 	/*
+	next versions:
+	pages size/orientation
+	custom font
+	*/
+
  if (!defined('TSMP_CONTACT_EMAIL')) define('TSMP_CONTACT_EMAIL', 'chris@yourtechguys.info');
  if (!defined('TSMP_PATH')) define('TSMP_PATH', plugin_dir_path(__FILE__));
- if (!defined('TSMP_VERSION')) define('TSMP_VERSION', '0.0.3');
+ if (!defined('TSMP_VERSION')) define('TSMP_VERSION', '0.1.0');
 
 
  //include admin files
@@ -22,33 +28,12 @@
 	include(TSMP_PATH . 'includes/admin-menu.php');
  }
 
-//generates form from shortcode
-include('form.php');
+	//generates pdf with ajax hook
+	include('pdf.php');
 
-//generates pdf with ajax hook
-include('pdf.php');
 
-//for guide page
-function format_time($string) {
-	if ($string == '12:00') return '12N';
-	if ($string == '23:59') return '12M';
-	list($hours, $minutes) = explode(':', $string);
-	$hours -= 0;
-	if ($hours == 0) return '12:' . $minutes . 'a';
-	if ($hours < 12) return $hours . ':' . $minutes . 'a';
-	if ($hours > 12) $hours -= 12;
-	return $hours . ':' . $minutes;
-}
-
-//need this for formatting the meeting types
-function decode_types($type) {
-	global $tsml_programs, $tsml_program;
-	if (!array_key_exists($type, $tsml_programs[$tsml_program]['types'])) return '';
-	return $tsml_programs[$tsml_program]['types'][$type];
-}
-
-//pdf function to get data and attach it to the regions array
-function attachPdfMeetingData() {
+	//pdf function to get data and attach it to the regions array
+	function attachPdfMeetingData() {
 
 	$meetings = tsml_get_meetings();
 
@@ -76,6 +61,7 @@ function attachPdfMeetingData() {
 				$formatted_day = "Unknown Day";
 			}
 
+			//cobble the meeting text together
 			$meetingtext = "";
 			$meetingtext .= $meeting['region'] . " ";
 			$meetingtext .= $meeting['sub_region'] . ", ";
@@ -87,7 +73,7 @@ function attachPdfMeetingData() {
 			$meetingtext .= $meeting['notes'] . ". ";
 			$meetingtext .= $meeting['location_notes'] . ". ";
 
-			//let's strip carriage returns and tables
+			//let's strip carriage returns that might be in location notes and notes
 			$meetingtext = str_replace("\r", "", $meetingtext);
 			$meetingtext = str_replace("\n", "", $meetingtext);
 			$meetingtext = str_replace("\t", "", $meetingtext);
@@ -101,7 +87,7 @@ function attachPdfMeetingData() {
 
 
 
-		//	$cellcontents[] = $thismeeting;
+		//put this meeting in array 
 			array_push($cellcontents, $thismeeting);
 	}
 
