@@ -4,7 +4,9 @@ add_action('admin_menu', 'tsmp_admin_menu');
 
 
 add_action('admin_init', 'tsmp_options_init' );
-    function tsmp_options_init(){
+
+function tsmp_options_init(){
+  //default values don's seem to work. wordpress documentation on using settings is splintered
       register_setting( 'tsmp-settings-group', 'tsmp_header', array(
                                         'type' => 'string',
                                         'default' => 'Some Group Meeting List',
