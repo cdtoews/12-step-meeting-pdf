@@ -22,17 +22,12 @@
 	$column_padding = get_option('tsmp_column_padding');
 	$outtro_text = get_option('tsmp_outtro_html');
 	$intro_text = get_option('tsmp_intro_html');
+	$page_width = get_option('tsmp_width');
+	$page_height = get_option('tsmp_height');
 
-
-	//next version maybe make way to adjust size/orientation
-	$page_width = 279.4; //11 inches
-	$page_height = 215.9; //8.5 inches
 
 	//calculate column width
-	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding)  ) / $number_of_columns;
-
-	//convert dimensions to mm
-	//$inch_converter			= 25.4; //25.4mm to an inch
+	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
 
 	//load libraries
 	require_once('vendor/autoload.php');
@@ -68,14 +63,13 @@
 
 	//create new PDF
 	//$pdf = new MyTCPDF();
-	$pdf = new MYPDF("L", PDF_UNIT, "Letter", true, 'UTF-8', false);
+	$pageLayout = array($page_width, $page_height); //  or array($height, $width)
+	$pdf = new MYPDF("L", PDF_UNIT, $pageLayout, true, 'UTF-8', false);
 	$pdf->SetFont('helvetica', '', $font_size);
-	$pdf->SetTitle('SLAA NEI Meeting List');
 
 	$pdf->SetMargins($margin_size, $margin_size, $margin_size, true);
 	$pdf->SetAutoPageBreak(TRUE, $margin_size);
 	$pdf->AddPage();
-
 
 	$this_column = "";
 	$current_day = "";
@@ -92,7 +86,7 @@
 
 	}else{
 		//add the divider
-		$this_column .=  "<div align=\"center\">--------------------------</div>" ;
+		$this_column .=  "<hr>"; //"<div align=\"center\">--------------------------</div>" ;
 	}
 
 

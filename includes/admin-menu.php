@@ -42,6 +42,16 @@ function tsmp_options_init(){
                                       'default' => '<h1>Thanks for Looking</h1>',
                                       )
                       );
+      register_setting( 'tsmp-settings-group', 'tsmp_width', array(
+                                        'type' => 'integer',
+                                        'default' => 356,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_height', array(
+                                        'type' => 'integer',
+                                        'default' => 216,
+                                        )
+                        );
       }
 
 function tsmp_admin_menu() {

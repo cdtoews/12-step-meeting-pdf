@@ -2,10 +2,10 @@
 Contributors: cdtoews
 Donate link: https://paypal.me/cdtoews
 Tags: 12 step, meeting list, pdf, 12 step meeting list
-Requires at least: 4.6
+Requires at least: 5.1
 Tested up to: 5.1
 Stable tag: 0.1.0
-Requires PHP: 5.2.4
+Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,3 +58,8 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 
 = 0.1.0 =
 * First Version
+
+== Upgrade Notice ==
+
+= 0.1.0 =
+This is the first publicly released version.

@@ -63,8 +63,8 @@
 
 			//cobble the meeting text together
 			$meetingtext = "";
-			$meetingtext .= $meeting['region'] . " ";
-			$meetingtext .= $meeting['sub_region'] . ", ";
+			$meetingtext .= "<font='+1'><b>" . $meeting['region'] . " ";
+			$meetingtext .= $meeting['sub_region'] . "</b></font>, ";
 			$meetingtext .= $meeting['time_formatted'] . ", ";
 			$meetingtext .= "(" . implode (',' , $meeting['types']) . ") ";
 			$meetingtext .= $meeting['name'] . ". ";
