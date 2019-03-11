@@ -22,6 +22,16 @@
  if (!defined('TSMP_VERSION')) define('TSMP_VERSION', '0.1.0');
 
 
+ if ( ! function_exists('write_log')) {
+    function write_log ( $log )  {
+       if ( is_array( $log ) || is_object( $log ) ) {
+          error_log( print_r( $log, true ) );
+       } else {
+          error_log( $log );
+       }
+    }
+ }
+
  //include admin files
  if (is_admin()) {
  	include(TSMP_PATH . 'includes/admin-gen.php');
@@ -34,8 +44,12 @@
 
 	//pdf function to get data and attach it to the regions array
 	function attachPdfMeetingData() {
-
-	$meetings = tsml_get_meetings();
+  
+  $meetings = tsml_get_meetings(array(
+    'post_status'  => array("publish","private")
+  ));
+  
+  //$meetings = tsml_get_meetings();
 
 	$cellcontents = array();
 	foreach ($meetings as $meeting) {
