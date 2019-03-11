@@ -71,38 +71,38 @@
 	$pdf->SetAutoPageBreak(TRUE, $margin_size);
 	$pdf->AddPage();
 
-	$this_column = "";
+	$column_text = "";
 	$current_day = "";
 
-	//$this_column .= $header_text;
-	$this_column .= $intro_text;
+	//$column_text .= $header_text;
+	//$column_text .= $intro_text;
 
 	foreach ($meetings as $meeting){
 
 	if($meeting['formatted_day'] !== $current_day){
 			$current_day = $meeting['formatted_day'];
 			//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
-			$this_column .=  "<div align=\"center\"><font size=\"+2\">========" . $current_day . "========</font></div>" ;
+			$column_text .=  "<div align=\"center\"><font size=\"+2\">========" . $current_day . "========</font></div>" ;
 
 	}else{
 		//add the divider
-		$this_column .=  "<hr>"; //"<div align=\"center\">--------------------------</div>" ;
+		$column_text .=  "<hr>"; //"<div align=\"center\">--------------------------</div>" ;
 	}
 
 
 	//add this meeting text to column text
-	$this_column .= $meeting['text'] ;
+	$column_text .= $meeting['text'] ;
 
 	}
 
 	//add outtro html to column text
-	$this_column .= $outtro_text;
+	//$column_text .= $outtro_text;
 
 	//setup coluns and write html
-	$pdf->resetColumns();
-	$pdf->setEqualColumns($number_of_columns, $column_width);
-	$pdf->selectColumn();
-	$pdf->writeHTML($this_column, true, false, true, false, 'J');
+	// $pdf->resetColumns();
+	// $pdf->setEqualColumns($number_of_columns, $column_width);
+	// $pdf->selectColumn();
+	// $pdf->writeHTML($column_text, true, false, true, false, 'J');
 
 	// seems to make php happy:
 	ob_end_clean();
