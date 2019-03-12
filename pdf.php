@@ -28,7 +28,7 @@
 
 	//calculate column width
 	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
-
+	$column_height = $page_height - ($margin_size * 2);
 	//load libraries
 	require_once('vendor/autoload.php');
 
@@ -76,24 +76,64 @@
 
 	//$column_text .= $header_text;
 	//$column_text .= $intro_text;
+	// $number_of_columns
+	$current_column = 1;
+	$skip_splitter_line = true;
+	
 
 	foreach ($meetings as $meeting){
 
-	if($meeting['formatted_day'] !== $current_day){
-			$current_day = $meeting['formatted_day'];
-			//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
-			$column_text .=  "<div align=\"center\"><font size=\"+2\">========" . $current_day . "========</font></div>" ;
+		$meeting_header = "";
+		
+		
+	
+		
+		$text_height = $pdf->getStringHeight($column_width, $column_text . $meeting_header . $meeting['text']);
+		
+		write_log('text height:' . $text_height )	;
 
-	}else{
-		//add the divider
-		$column_text .=  "<hr>"; //"<div align=\"center\">--------------------------</div>" ;
+			
+		if($text_height > $column_height ) {
+			//write column and move to new column 
+			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+			$column_y = $margin_size;
+			//               width       ,   height      ,  txt             , border, align,fill ,ln, x,       y          ,reseth,stretch,ishtml,autopad,maxh,
+			$pdf->MultiCell($column_width, $column_height, $column_text      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
+	//  $pdf->MultiCell(55,             60,            '[FIT CELL] '."\n", 1     , 'J', 1    , 1, 125      , 145      , true , 0     , false, true  , 60            , 'M', true);
+			$column_text = "";
+			$current_column++;
+			$skip_splitter_line = true;
+			if($current_column > $number_of_columns){
+				//need a new page 
+				$pdf->AddPage();
+				$current_column = 1;
+			}
+		}
+		
+		if($meeting['formatted_day'] !== $current_day){
+				$current_day = $meeting['formatted_day'];
+				//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
+				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $current_day . "========</font></div>" ;
+				$skip_splitter_line = true;
+		}elseif(	$skip_splitter_line ){
+			$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $current_day . " (cont)========</font></div>" ;
+			
+		}else{
+			$meeting_header = "<hr>";
+		}
+
+		
+		//add this meeting text to column text
+		$column_text .= $meeting_header  . $meeting['text']  ;
+		$skip_splitter_line = false;
+
 	}
 
+	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+	$column_y = $margin_size;
+	$pdf->MultiCell($column_width, $column_height, $column_text      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
 
-	//add this meeting text to column text
-	$column_text .= $meeting['text'] ;
 
-	}
 
 	//add outtro html to column text
 	//$column_text .= $outtro_text;
