@@ -48,15 +48,8 @@
 
 				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
 			}
-
-
-	    }
-
-	    // Page footer
-	    public function Footer() {
-	        //nothing here for now
-		  }
-		}
+    }
+	}//end of class 
 
 	//create new PDF
 	
@@ -91,7 +84,6 @@
 			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 			$end_page = $pdf->getPage();
 			
-			
 			if ($end_page == $start_page) {
 				//if we are still onthe same page 
 				$pdf->commitTransaction();
@@ -111,8 +103,6 @@
 				$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 				
 			}
-		
-		
 	}//end of Loop
 }//end of if
 		
@@ -209,13 +199,11 @@
 				
 			}
 		
-		
-	}//end of Loop
-}//end of if
+		}//end of Loop
+	}//end of if
 
-	// seems to make php happy:
+	//this seems to make php happy:
 	ob_end_clean();
-
 	$pdf->Output('meeting_list.pdf', 'I');
 
 	exit;
