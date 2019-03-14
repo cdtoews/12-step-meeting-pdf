@@ -73,19 +73,79 @@
 
 	$column_text = "";
 	$current_column = 1;
+	//starting x,y for the start of this column 
 	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 	$column_y = $margin_size;
+	
 	//loop through pre-html 
 	$leftover_html = "";
-	$html_array = explode($html_delimiter, $intro_text );
-	//$y = $column_y;
-	foreach ($html_array as $html_block) {
-		$html_block .= $html_delimiter; //put back what we striped out 
+	if($intro_text != ""){
+		$html_array = explode($html_delimiter, $intro_text );
+		//$y = $column_y;
+		foreach ($html_array as $html_block) {
+			$html_block .= $html_delimiter; //put back what we striped out 
+			
+			$start_page = $pdf->getPage();
+			
+			$pdf->startTransaction();
+			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+			$end_page = $pdf->getPage();
+			
+			//if we are still onthe same page 
+			if ($end_page == $start_page) {
+			
+				$pdf->commitTransaction();
+			}else{ //we would have popped to a new page 
+				$pdf = $pdf->rollbackTransaction();
+				//make column prior to adding new block, and reset $column_text
+				// ** if a single block is larger than a page, we are in trouble here 
+				
+				$current_column++;
+				//reset X and Y to next column 
+				
+				
+				if($current_column > $number_of_columns){ //last column on the page 
+					//need a new page 
+					$pdf->AddPage();
+					$current_column = 1;
+				}
+				$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+				$column_y = $margin_size;
+				$pdf->SetXY($column_x,$column_y, true);
+				$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+				
+			}
+		
+		
+	}//end of Loop
+}//end of if
+		
+	// ==========================================================
+	//                       meetings 
+	// ==========================================================
+	
+
+	$current_day = "";
+		//loop through meetings 
+	foreach ($meetings as $meeting){
+		$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+		$column_y = $margin_size;
+		// $meeting_header = "";
+		// -------------------------------------------------------------------------
+		if($meeting['formatted_day'] !== $current_day){
+				$current_day = $meeting['formatted_day'];
+				//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
+				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $meeting['formatted_day'] . "========</font></div>" ;
+				
+		}else{
+			$meeting_header = "<hr>";
+		}
+		
 		
 		$start_page = $pdf->getPage();
 		
 		$pdf->startTransaction();
-		$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+		$pdf->MultiCell($column_width, 1,  $meeting_header . $meeting['text'], 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 		$end_page = $pdf->getPage();
 		
 		//if we are still onthe same page 
@@ -96,96 +156,41 @@
 			$pdf = $pdf->rollbackTransaction();
 			//make column prior to adding new block, and reset $column_text
 			// ** if a single block is larger than a page, we are in trouble here 
-			$column_text = $html_block;
+			if($meeting['formatted_day'] !== $current_day){
+					
+					//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
+					$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $meeting['formatted_day'] . "========</font></div>" ;
+					
+			}else{
+				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $meeting['formatted_day'] . " (cont)========</font></div>" ;
+				
+			}
 			$current_column++;
-			//reset X and Y to next column 
-			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-			$column_y = $margin_size;
-			$pdf->SetXY($column_x,$column_y, true);
+		
 			
 			if($current_column > $number_of_columns){ //last column on the page 
 				//need a new page 
 				$pdf->AddPage();
 				$current_column = 1;
 			}
-			$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
-			
-		}
-		//let's push it up a tiny bit 
-//		$y = $pdf->getY() -3;
-
-	
-	}
-		
-	//for debug:
-	$pdf->AddPage();
-		
-	
-	//loop through meetings 
-	$current_day = "";
-	$skip_splitter_line = true;
-	foreach ($meetings as $meeting){
-
-		$meeting_header = "";
-		
-		
-	
-		
-		$text_height = $pdf->getStringHeight($column_width, $column_text . $meeting_header . $meeting['text']);
-		
-		//write_log('text height:' . $text_height )	;
-
-			
-		if($text_height > $column_height ) { //if the text will be to big if we add the next meeting
-			//write column and move to new column 
+			//reset X and Y to next column 
 			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 			$column_y = $margin_size;
-			//               width       ,   height      ,  txt             , border, align,fill ,ln, x,       y          ,reseth,stretch,ishtml,autopad,maxh,
-			$pdf->MultiCell($column_width, $column_height, $column_text      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
-	//  $pdf->MultiCell(55,             60,            '[FIT CELL] '."\n", 1     , 'J', 1    , 1, 125      , 145      , true , 0     , false, true  , 60            , 'M', true);
-			$column_text = "";
-			$current_column++;
-			$skip_splitter_line = true;
-			if($current_column > $number_of_columns){
-				//need a new page 
-				$pdf->AddPage();
-				$current_column = 1;
-			}
-		}
-		
-		if($meeting['formatted_day'] !== $current_day){
-				$current_day = $meeting['formatted_day'];
-				//$pdf->Write(0, '------ ' . $current_day . ' -------', '', 0, 'L', true, 0, false, false, 0);
-				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $current_day . "========</font></div>" ;
-				$skip_splitter_line = true;
-		}elseif(	$skip_splitter_line ){
-			$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $current_day . " (cont)========</font></div>" ;
+			$pdf->SetXY($column_x,$column_y, true);
 			
-		}else{
-			$meeting_header = "<hr>";
+			$pdf->MultiCell($column_width, 1, $meeting_header . $meeting['text'] , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
+			
 		}
 
+		$current_day = $meeting['formatted_day'];
+	
 		
-		//add this meeting text to column text
-		$column_text .= $meeting_header  . $meeting['text']  ;
-		$skip_splitter_line = false;
+		
+	
 
 	}
 
-	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-	$column_y = $margin_size;
-	$pdf->MultiCell($column_width, $column_height, $column_text      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
 
-
-
-	//add outtro html to column text
-	//$column_text .= $outtro_text;
-
-	//setup coluns and write html
-	// $pdf->resetColumns();
-	// $pdf->setEqualColumns($number_of_columns, $column_width);
-	// $pdf->selectColumn();
-	// $pdf->writeHTML($column_text, true, false, true, false, 'J');
 
 	// seems to make php happy:
 	ob_end_clean();
