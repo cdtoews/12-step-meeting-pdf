@@ -24,7 +24,7 @@
 	$intro_text = get_option('tsmp_intro_html');
 	$page_width = get_option('tsmp_width');
 	$page_height = get_option('tsmp_height');
-
+	$html_delimiter = "<br>";
 
 	//calculate column width
 	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
@@ -72,15 +72,35 @@
 	$pdf->AddPage();
 
 	$column_text = "";
-	$current_day = "";
-
-	//$column_text .= $header_text;
-	//$column_text .= $intro_text;
-	// $number_of_columns
 	$current_column = 1;
-	$skip_splitter_line = true;
+	//loop through pre-html 
+	$html_array = explode($html_delimiter, $intro_text );
+	foreach ($html_array as $html_block) {
+		$html_block .= $html_delimiter; //put back what we striped out 
+		$text_height = $pdf->getStringHeight($column_width, $column_text . $html_block);
+		
+		if($text_height > $column_height ) { //if the text will be to big if we add the next block of html
+			//write column and move to new column 
+			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+			$column_y = $margin_size;
+			//               width       ,   height      ,  txt             , border, align,fill ,ln, x,       y          ,reseth,stretch,ishtml,autopad,maxh,
+			$pdf->MultiCell($column_width, $column_height, $column_text      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
+			$column_text = "";
+			$current_column++;
+			if($current_column > $number_of_columns){
+				//need a new page 
+				$pdf->AddPage();
+				$current_column = 1;
+			}
+		}
+		$column_text .= $html_block;
+	}
+		//grab the last block of html
+		$column_text .= $html_block;
 	
-
+	//loop through meetings 
+	$current_day = "";
+	$skip_splitter_line = true;
 	foreach ($meetings as $meeting){
 
 		$meeting_header = "";
@@ -93,7 +113,7 @@
 		//write_log('text height:' . $text_height )	;
 
 			
-		if($text_height > $column_height ) {
+		if($text_height > $column_height ) { //if the text will be to big if we add the next meeting
 			//write column and move to new column 
 			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 			$column_y = $margin_size;

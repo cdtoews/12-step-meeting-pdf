@@ -46,9 +46,9 @@
 	function attachPdfMeetingData() {
   
     $meetings = tsml_get_meetings(  
-       array( 'post_status' => array('publish', 'private')  ) );
-     //   ,false
-     // ); 
+       array( 'post_status' => array('publish', 'private')  )
+       ,false
+     ); 
   write_log("size of meetings:" . sizeof($meetings));
   //$meetings = tsml_get_meetings();
 
