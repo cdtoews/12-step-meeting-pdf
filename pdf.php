@@ -77,9 +77,36 @@
 	$html_array = explode($html_delimiter, $intro_text );
 	foreach ($html_array as $html_block) {
 		$html_block .= $html_delimiter; //put back what we striped out 
-		$text_height = $pdf->getStringHeight($column_width, $column_text . $html_block);
+		// $text_height = $pdf->getStringHeight($column_width, $column_text . $html_block);
 		
-		if($text_height > $column_height ) { //if the text will be to big if we add the next block of html
+	//	-------------------------------
+		// store current object
+		$break_column = false;
+	$pdf->startTransaction();
+	// store starting values
+	$start_y = $pdf->GetY();
+	$start_page = $pdf->getPage();
+	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+	$column_y = $margin_size;
+	// call your printing functions with your parameters
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	$pdf->MultiCell($column_width, $column_height, $column_text . $html_block      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// get the new Y
+	$end_y = $pdf->GetY();
+	$end_page = $pdf->getPage();
+	// calculate height
+	$text_height = 0;
+	if ($end_page == $start_page) {
+	   //
+	} else {
+	    $break_column = true;
+	}
+	// restore previous object
+	$pdf = $pdf->rollbackTransaction();
+	//	----------------------------
+		
+		if($break_column) { //if the text will be to big if we add the next block of html
 			//write column and move to new column 
 			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 			$column_y = $margin_size;

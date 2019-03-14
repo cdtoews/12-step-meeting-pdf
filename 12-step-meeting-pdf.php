@@ -49,8 +49,8 @@
        array( 'post_status' => array('publish', 'private')  )
        ,false
      ); 
-  write_log("size of meetings:" . sizeof($meetings));
-  //$meetings = tsml_get_meetings();
+  //write_log("size of meetings:" . sizeof($meetings));
+  
 
 	$cellcontents = array();
 	foreach ($meetings as $meeting) {
