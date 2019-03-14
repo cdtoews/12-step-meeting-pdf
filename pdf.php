@@ -24,7 +24,7 @@
 	$intro_text = get_option('tsmp_intro_html');
 	$page_width = get_option('tsmp_width');
 	$page_height = get_option('tsmp_height');
-	$html_delimiter = "<br>";
+	$html_delimiter = "</div>";
 
 	//calculate column width
 	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
@@ -73,84 +73,53 @@
 
 	$column_text = "";
 	$current_column = 1;
+	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+	$column_y = $margin_size;
 	//loop through pre-html 
 	$leftover_html = "";
 	$html_array = explode($html_delimiter, $intro_text );
+	//$y = $column_y;
 	foreach ($html_array as $html_block) {
 		$html_block .= $html_delimiter; //put back what we striped out 
-		// $text_height = $pdf->getStringHeight($column_width, $column_text . $html_block);
 		
-	//	-------------------------------
-	// // store current object
-	// $break_column = false;
-	// $pdf->startTransaction();
-	// // store starting values
-	// $start_y = $pdf->GetY();
-	// $start_page = $pdf->getPage();
-	// $column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-	// $column_y = $margin_size;
-	// // call your printing functions with your parameters
-	// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// $pdf->MultiCell($column_width, $column_height, $column_text . $html_block      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
-	// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// // get the new Y
-	// $end_y = $pdf->GetY();
-	// $end_page = $pdf->getPage();
-	// // calculate height
-	// $text_height = 0;
-	// if ($end_page == $start_page) {
-	//    //
-	// } else {
-	//     $break_column = true;
-	// }
-	// // restore previous object
-	// $pdf = $pdf->rollbackTransaction();
-	//	----------------------------
 		$start_page = $pdf->getPage();
-		$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-		$column_y = $margin_size;
+		
 		$pdf->startTransaction();
-		$pdf->MultiCell($column_width, $column_height, $column_text . $html_block      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
+		$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 		$end_page = $pdf->getPage();
 		
 		//if we are still onthe same page 
 		if ($end_page == $start_page) {
-			$column_text .= $html_block;
-			$pdf = $pdf->rollbackTransaction();
+		
+			$pdf->commitTransaction();
 		}else{ //we would have popped to a new page 
 			$pdf = $pdf->rollbackTransaction();
 			//make column prior to adding new block, and reset $column_text
 			// ** if a single block is larger than a page, we are in trouble here 
-			$pdf->MultiCell($column_width, $column_height, $column_text , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
 			$column_text = $html_block;
 			$current_column++;
+			//reset X and Y to next column 
+			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+			$column_y = $margin_size;
+			$pdf->SetXY($column_x,$column_y, true);
+			
 			if($current_column > $number_of_columns){ //last column on the page 
 				//need a new page 
 				$pdf->AddPage();
 				$current_column = 1;
 			}
-		}
+			$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
 			
-		
-		// if($break_column) { //if the text will be to big if we add the next block of html
-		// 	//write column and move to new column 
-		// 	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-		// 	$column_y = $margin_size;
-		// 	//               width       ,   height      ,  txt             , border, align,fill ,ln, x,       y          ,reseth,stretch,ishtml,autopad,maxh,
-		// 	$pdf->MultiCell($column_width, $column_height, $column_text      , 0     , 'J', 0    , 1, $column_x, $column_y, true , 0     , true, true   , $column_height, 'T', true);
-		// 	$column_text = "";
-		// 	$current_column++;
-		// 	if($current_column > $number_of_columns){
-		// 		//need a new page 
-		// 		$pdf->AddPage();
-		// 		$current_column = 1;
-		// 	}
-		// }
-		// $column_text .= $html_block;
-		$leftover_html = $html_block;
+		}
+		//let's push it up a tiny bit 
+//		$y = $pdf->getY() -3;
+
+	
 	}
-		//grab the last block of html
-		$column_text .= $leftover_html;
+		
+	//for debug:
+	$pdf->AddPage();
+		
 	
 	//loop through meetings 
 	$current_day = "";
