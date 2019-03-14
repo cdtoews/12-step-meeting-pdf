@@ -45,10 +45,11 @@
 	//pdf function to get data and attach it to the regions array
 	function attachPdfMeetingData() {
   
-  $meetings = tsml_get_meetings(array(
-    'post_status'  => array("publish","private")
-  ));
-  
+    $meetings = tsml_get_meetings(  
+       array( 'post_status' => array('publish', 'private')  ) );
+     //   ,false
+     // ); 
+  write_log("size of meetings:" . sizeof($meetings));
   //$meetings = tsml_get_meetings();
 
 	$cellcontents = array();
@@ -81,11 +82,11 @@
 			$meetingtext .= $meeting['sub_region'] . "</b></font>, ";
 			$meetingtext .= $meeting['time_formatted'] . ", ";
 			$meetingtext .= "(" . implode (',' , $meeting['types']) . ") ";
-			$meetingtext .= $meeting['name'] . ". ";
-			$meetingtext .= $meeting['location'] . ". ";
+			$meetingtext .= @$meeting['name'] . ". ";
+			$meetingtext .= @$meeting['location'] . ". ";
 			$meetingtext .= @$parts[0] . ". ";
-			$meetingtext .= $meeting['notes'] . ". ";
-			$meetingtext .= $meeting['location_notes'] . ". ";
+			$meetingtext .= @$meeting['notes'] . ". ";
+			$meetingtext .= @$meeting['location_notes'] . ". ";
 
 			//let's strip carriage returns that might be in location notes and notes
 			$meetingtext = str_replace("\r", "", $meetingtext);

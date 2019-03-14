@@ -90,7 +90,7 @@
 		
 		$text_height = $pdf->getStringHeight($column_width, $column_text . $meeting_header . $meeting['text']);
 		
-		write_log('text height:' . $text_height )	;
+		//write_log('text height:' . $text_height )	;
 
 			
 		if($text_height > $column_height ) {
