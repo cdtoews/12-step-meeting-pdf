@@ -12,9 +12,11 @@ This plugin requires '12 Step Meeting List', and allows creation of meeting list
 
 == Description ==
 
-If you use the '12 Step Meeting List', you know the PDF generation in that plugin is lacking. I created
-this plugin to help my own group, and decided to make the plugin publicly available.
-You can choose the page size and orientation.
+If you use the '12 Step Meeting List', this plugin will help with printing 
+meeting lists. I created this plugin to help my own group, and decided to 
+make the plugin publicly available. You can choose the page size and orientation.
+Currently it only supports listed the meetings in columns. The plugin assumes 
+that your region is your state, and sub-region is the city.
 
 Source Code: https://github.com/cdtoews/12-step-meeting-pdf
 
@@ -54,6 +56,10 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 1. No Screenshots yet
 
 == Changelog ==
+
+= 0.1.2 =
+* Parsing state and city from address, not region and sub-region 
+
 
 = 0.1.1 =
 * Better management of meeting text within columns 
