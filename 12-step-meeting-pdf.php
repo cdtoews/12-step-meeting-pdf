@@ -49,7 +49,7 @@
        array( 'post_status' => array('publish', 'private')  )
        ,false
      ); 
-  //write_log("size of meetings:" . sizeof($meetings));
+    
   
 
 	$cellcontents = array();
@@ -75,11 +75,27 @@
 			}else{
 				$formatted_day = "Unknown Day";
 			}
-
-			//cobble the meeting text together
+      $formatted_adddress = @$meeting[formatted_address];
+      
+      $city = "";
+      $state = "";
+      //get state and city from formatted address 
+      $address_split = explode(",", $formatted_adddress);
+      if(sizeof($address_split) == 4){
+        $city = trim($address_split[1]);
+        $state = explode(" ", trim($address_split[2]))[0];
+      }elseif(sizeof($address_split) == 3){
+        $city = trim($address_split[0]);
+        $state = trim($address_split[1]);
+      }else{
+        $city = "";
+        $state = "";
+      }
+      
+      //cobble the meeting text together
 			$meetingtext = "";
-			$meetingtext .= "<font='+1'><b>" . $meeting['region'] . " ";
-			$meetingtext .= $meeting['sub_region'] . "</b></font>, ";
+			$meetingtext .= "<font='+1'><b>" . $state . " ";
+			$meetingtext .= $city . "</b></font>, ";
 			$meetingtext .= $meeting['time_formatted'] . ", ";
 			$meetingtext .= "(" . implode (',' , $meeting['types']) . ") ";
 			$meetingtext .= @$meeting['name'] . ". ";
