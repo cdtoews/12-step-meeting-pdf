@@ -60,7 +60,6 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 = 0.1.2 =
 * Parsing state and city from address, not region and sub-region 
 
-
 = 0.1.1 =
 * Better management of meeting text within columns 
 * Custom page sizes/orientations
