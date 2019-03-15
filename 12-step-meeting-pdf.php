@@ -80,13 +80,13 @@
       $city = "";
       $state = "";
       //get state and city from formatted address 
-      $address_split = explode(",", $formatted_adddress);
+      $address_split = explode(", ", $formatted_adddress);
       if(sizeof($address_split) == 4){
-        $city = trim($address_split[1]);
+        $city = $address_split[1];
         $state = explode(" ", trim($address_split[2]))[0];
       }elseif(sizeof($address_split) == 3){
-        $city = trim($address_split[0]);
-        $state = trim($address_split[1]);
+        $city = $address_split[0];
+        $state = $address_split[1];
       }else{
         $city = "";
         $state = "";
@@ -112,9 +112,10 @@
 			$thismeeting = array(
 					'text' => $meetingtext,
 					'day' => $meeting['day'],
+          'city' => $city,
+          'state' => $state,
 					'formatted_day' => $formatted_day
-
-			);
+	     );
 
 
 
