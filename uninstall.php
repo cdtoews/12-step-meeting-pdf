@@ -12,3 +12,8 @@ unregister_setting( 'tsmp-settings-group', 'tsmp_font_size');
 unregister_setting( 'tsmp-settings-group', 'tsmp_column_count');
 unregister_setting( 'tsmp-settings-group', 'tsmp_column_padding');
 unregister_setting( 'tsmp-settings-group', 'tsmp_outtro_html');
+unregister_setting( 'tsmp-settings-group', 'tsmp_layout');
+unregister_setting( 'tsmp-settings-group', 'tsmp_first_page_no');
+unregister_setting( 'tsmp-settings-group', 'tsmp_include_index');
+
+

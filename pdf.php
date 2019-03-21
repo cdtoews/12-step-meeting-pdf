@@ -8,6 +8,174 @@
 	} elseif (!current_user_can('edit_posts')) {
 		die('you do not have access to view this page');
 	}
+	
+	require_once('vendor/autoload.php');
+	
+	$page_layout = get_option('tsmp_layout');
+	if($page_layout == "table1"){
+		tsmp_create_pdf_table1();
+	}else{
+		//we'll assume columns1 
+		tsmp_create_pdf_columns1();
+	}
+
+});
+
+// ==========================================================================
+//                        Make Table1
+// ==========================================================================
+
+
+function tsmp_create_pdf_table1(){
+	global $wpdb, $margins, $font_table_rows, $page_width, $page_height, $table_padding, $font_header, 
+	$header_top, $font_footer, $footer_bottom, $first_column_width, $table_border_width, $font_table_rows, 
+	$table_padding, $font_table_header, $first_column_width, $day_column_width, $table_border_width, $font_table_rows, 
+	$table_padding, $first_column_width, $day_column_width, $table_border_width, $inner_page_height, $font_table_rows, 
+	$index, $exclude_from_indexes, $zip_codes, $table_padding, $line_height_ratio;
+	//must be a logged-in user to run this page (otherwise last_contact will be null)
+	if (!is_user_logged_in()) {
+		auth_redirect();
+	} elseif (!current_user_can('edit_posts')) {
+		die('you do not have access to view this page');
+	}
+	
+	ini_set('max_execution_time', 60);
+	//output PDF of NYC meeting list using the TCPDF library
+	//don't show these in indexes
+	$exclude_from_indexes	= array('Beginner', 'Candlelight', 'Closed', 'Grapevine', 'Literature', 'Open', 'Topic Discussion');
+	
+	$margin_size = get_option('tsmp_margin');
+	$font_size = get_option('tsmp_font_size');
+	$number_of_columns = get_option('tsmp_column_count');
+	$column_padding = get_option('tsmp_column_padding');
+	$outtro_text = get_option('tsmp_outtro_html');
+	$intro_text = get_option('tsmp_intro_html');
+	$page_width = get_option('tsmp_width');
+	$page_height = get_option('tsmp_height');
+	
+	
+	$first_page_no = 1;
+	
+	//config dimensions, in inches
+	$table_border_width		= .1;
+	//convert dimensions to mm
+	$inch_converter			= 25.4; //25.4mm to an inch
+
+	$table_padding		= 1.8; //in mm
+	$header_top			= 9;
+	$footer_bottom 		= -15;
+	$font_header			= array('helvetica', 'b', 18);
+	$font_footer			= array('helvetica', 'r', 10);
+	$font_table_header	= array('helvetica', 'b', 8);
+	$font_table_rows		= array('dejavusans', 'r', 6.4); //for the unicode character
+	$font_index_header	= array('helvetica', 'b', 9);
+	$font_index_rows		= array('helvetica', 'r', 6);
+
+
+	$line_height_ratio	= 2.87;
+	$index_width			= 57; // in mm
+	$table_gap			= .25 * $inch_converter; //gap between tables
+	
+	
+	$inner_page_width		= $page_width - ($margin_size * 2);
+	$inner_page_height		= $page_height - ($margin_size * 2);
+	$first_column_width		= $inner_page_width * .37;
+	$day_column_width		= ($inner_page_width - $first_column_width) / 7;
+	$page_threshold			= .5 * $inch_converter; //amount of space to start a new section
+	$index = $zip_codes		= array();
+	//main sections are here manually to preserve book order
+	$region_ids = tsml_get_all_regions();
+
+	$regions = array();
+	foreach ($region_ids as $region_id) {
+		$regions[$region_id] = array();
+	}
+
+
+	require_once('columntcpdf.php');
+	//run function to attach meeting data to $regions
+	$regions = attachPdfRegionData($regions);
+	
+
+	//create new PDF
+	$pdf = new ColumnTCPDF();
+	foreach ($regions as $region) {
+
+		if(empty($region)){
+			// if nothing in this region, skip 
+			continue;
+		}
+		$pdf->header = $region['name'];
+		$pdf->NewPage();
+		
+		if (!empty($region['sub_regions'])) {
+
+			//array_shift($region['sub_regions']);
+			foreach ($region['sub_regions'] as $sub_region => $rows) {
+				
+				//create a new page if there's not enough space
+				if (($inner_page_height - $pdf->GetY()) < $page_threshold) {
+					$pdf->NewPage();
+				}
+				
+				//draw rows
+				$pdf->drawTable($sub_region, $rows, $region['name']);
+				
+				//draw a gap between tables if there's space
+				if (($inner_page_height - $pdf->GetY()) > $table_gap) {
+					$pdf->Ln($table_gap);
+				}
+				
+				//break; //for debugging
+			}
+		} elseif ($region['rows']) {
+			$pdf->drawTable($region['name'], $region['rows'], $region['name']);
+		}
+		//break; //for debugging
+	}
+	//index
+	ksort($index);
+	$pdf->header = 'Index';
+	$pdf->NewPage();
+	$pdf->SetEqualColumns(3, $index_width);
+	$pdf->SetCellPaddings(0, 1, 0, 1);
+	$index_output = '';
+	foreach ($index as $category => $rows) {
+		ksort($rows);
+		$pdf->SetFont($font_index_header[0], $font_index_header[1], $font_index_header[2]);
+		$pdf->Cell(0, 0, $category, array('B'=>array('width' => .25)), 1);
+		$pdf->SetFont($font_index_rows[0], $font_index_rows[1], $font_index_rows[2]);
+		foreach ($rows as $group => $page) {
+			if ($pos = strpos($group, ' #')) $group = substr($group, 0, $pos);
+			if (strlen($group) > 33) $group = substr($group, 0, 32) . '…';
+			$pdf->Cell($index_width * .88, 0, $group, array('B'=>array('width' => .1)), 0);
+			$pdf->Cell($index_width * .12, 0, $page, array('B'=>array('width' => .1)), 1, 'R');
+		}
+		$pdf->Ln(4);
+	}
+	//zips are a little different, because page numbers is an array
+	$pdf->SetFont($font_index_header[0], $font_index_header[1], $font_index_header[2]);
+	$pdf->Cell(0, 0, 'ZIP Codes', array('B'=>array('width' => .25)), 1);
+	$pdf->SetFont($font_index_rows[0], $font_index_rows[1], $font_index_rows[2]);
+	ksort($zip_codes);
+	foreach ($zip_codes as $zip => $pages) {
+		$pages = array_unique($pages);
+		$pdf->Cell($index_width * .35, 0, $zip, array('B'=>array('width' => .1)), 0);
+		$pdf->Cell($index_width * .65, 0, implode(', ', $pages), array('B'=>array('width' => .1)), 1, 'R');
+	}
+	$pdf->Output( 'meeting_list.pdf', 'I');
+	exit;
+	
+}
+
+
+
+
+// ===========================================================================
+//                      Make Columns 1
+// ===========================================================================
+
+function tsmp_create_pdf_columns1(){
 	ob_start();
 	ini_set('max_execution_time', 60);
 
@@ -25,12 +193,12 @@
 	$page_width = get_option('tsmp_width');
 	$page_height = get_option('tsmp_height');
 	$html_delimiter = "</div>";
-
+	
 	//calculate column width
 	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
 	$column_height = $page_height - ($margin_size * 2);
 	//load libraries
-	require_once('vendor/autoload.php');
+
 
 	//run function to attach meeting data to $meetings
 	$meetings = attachPdfMeetingData();
@@ -38,8 +206,8 @@
 	// Extend the TCPDF class to create custom Header and Footer
 	class MYPDF extends TCPDF {
 
-    //Page header
-    public function Header() {
+		//Page header
+		public function Header() {
 			$header_text = get_option('tsmp_header');
 
 			if ($header_text != "") {
@@ -48,7 +216,7 @@
 
 				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
 			}
-    }
+		}
 	}//end of class 
 
 	//create new PDF
@@ -66,9 +234,9 @@
 	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 	$column_y = $margin_size;
 	
-	// ==========================================================
+	// ----------------------------------------------------------
 	//                       Pre HTML  
-	// =========================================================
+	// ----------------------------------------------------------
 	
 	//loop through pre-html 
 	if($intro_text != ""){
@@ -106,9 +274,9 @@
 	}//end of Loop
 }//end of if
 		
-	// ==========================================================
+	// ----------------------------------------------------------
 	//                       meetings 
-	// ==========================================================
+	// ----------------------------------------------------------
 	
 	$current_day = "";
 		//loop through meetings 
@@ -163,9 +331,9 @@
 
 	}
 
-	// ==========================================================
+	// ----------------------------------------------------------
 	//                       Post HTML  
-	// ==========================================================
+	// ----------------------------------------------------------
 	if($outtro_text != ""){
 		$html_array = explode($html_delimiter, $outtro_text );
 		//$y = $column_y;
@@ -207,4 +375,5 @@
 	$pdf->Output('meeting_list.pdf', 'I');
 
 	exit;
-});
+	
+}

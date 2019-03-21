@@ -52,6 +52,21 @@ function tsmp_options_init(){
                                         'default' => 216,
                                         )
                         );
+      register_setting( 'tsmp-settings-group', 'tsmp_layout', array(
+                                        'type' => 'string',
+                                        'default' => 'columns1',
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_first_page_no', array(
+                                        'type' => 'integer',
+                                        'default' => 1,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_include_index', array(
+                                        'type' => 'integer',
+                                        'default' => 1,
+                                        )
+                        );
       }
 
 function tsmp_admin_menu() {
