@@ -186,7 +186,10 @@ function attachPdfRegionData($regions) {
 		
 	//build an array of table rows for each region all in one shot, to preserve memory
 	$rows = array();
-	$meetings = tsml_get_meetings();
+	$meetings = tsml_get_meetings(  
+     array( 'post_status' => array('publish', 'private')  )
+     ,false
+   ); 
 	foreach ($meetings as $meeting) {
 		
 		//we group meetings by group-at-location
