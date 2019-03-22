@@ -38,6 +38,10 @@ This section describes how to install the plugin and get it working.
 
 Yes, in the version 0.1.1 custom paper sizes/orientations were added.
 
+= Can I include meetings on the printed list without having them on the website? =
+
+Yes, Any meetings you want included in the printed list, and not included in the website, just create the meeting as normal, and set the Visibility to private.
+
 = What do each of the values do in the plugin? =
 
 * Page Layout: This lets you choose between column and table formats
