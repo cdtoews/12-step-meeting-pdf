@@ -92,13 +92,13 @@ function tsmp_create_pdf_table1(){
 	}
 
 
-	require_once('columntcpdf.php');
+	require_once('tabletcpdf.php');
 	//run function to attach meeting data to $regions
 	$regions = attachPdfRegionData($regions);
 	
 
 	//create new PDF
-	$pdf = new ColumnTCPDF();
+	$pdf = new TableTCPDF();
 	foreach ($regions as $region) {
 
 		if(empty($region)){
