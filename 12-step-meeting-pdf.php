@@ -77,78 +77,25 @@
      ); 
     
 
-	$cellcontents = array();
+	$mymeetings = array();
 	foreach ($meetings as $meeting) {
-			@$parts = explode(', ', $meeting['formatted_address']);
-
-			$day = $meeting['day'];
-			$formatted_day = "";
-			if($day == 0){
-				$formatted_day = "Sunday";
-			}elseif ($day == 1){
-				$formatted_day = "Monday";
-			}elseif ($day == 2){
-				$formatted_day = "Tuesday";
-			}elseif ($day == 3){
-				$formatted_day = "Wednesday";
-			}elseif ($day == 4){
-				$formatted_day = "Thursday";
-			}elseif ($day == 5){
-				$formatted_day = "Friday";
-			}elseif ($day == 6){
-				$formatted_day = "Saturday";
-			}else{
-				$formatted_day = "Unknown Day";
-			}
-      $formatted_adddress = @$meeting[formatted_address];
-      
-      $city = "";
-      $state = "";
-      //get state and city from formatted address 
-      $address_split = explode(", ", $formatted_adddress);
-      if(sizeof($address_split) == 4){
-        $city = $address_split[1];
-        $state = explode(" ", trim($address_split[2]))[0];
-      }elseif(sizeof($address_split) == 3){
-        $city = $address_split[0];
-        $state = $address_split[1];
-      }else{
-        $city = "";
-        $state = "";
-      }
-      
-      //cobble the meeting text together
-			$meetingtext = "";
-			$meetingtext .= "<font='+1'><b>" . $state . " ";
-			$meetingtext .= $city . "</b></font>, ";
-			$meetingtext .= $meeting['time_formatted'] . ", ";
-			$meetingtext .= "(" . implode (',' , $meeting['types']) . ") ";
-			$meetingtext .= @$meeting['name'] . ". ";
-			$meetingtext .= @$meeting['location'] . ". ";
-			$meetingtext .= @$parts[0] . ". ";
-			$meetingtext .= @$meeting['notes'] . ". ";
-			$meetingtext .= @$meeting['location_notes'] . ". ";
-
-			//let's strip carriage returns that might be in location notes and notes
-			$meetingtext = str_replace("\r", "", $meetingtext);
-			$meetingtext = str_replace("\n", "", $meetingtext);
-			$meetingtext = str_replace("\t", "", $meetingtext);
-
-			$thismeeting = array(
-					'text' => $meetingtext,
-					'day' => $meeting['day'],
-          'city' => $city,
-          'state' => $state,
-					'formatted_day' => $formatted_day
-	     );
+			
+			// $thismeeting = array(
+			// 		'text' => $meetingtext,
+			// 		'day' => $meeting['day'],
+      //     'city' => $city,
+      //     'state' => $state,
+			// 		'formatted_day' => $formatted_day,
+      //     'time' => $meeting['time_formatted'],
+      //     'types' => $meeting['types']
+	    //  );
 
 
-
-		//put this meeting in array
-			array_push($cellcontents, $thismeeting);
+      $mymeeting =  new  meeting($meeting); 
+			array_push($mymeetings, $mymeeting);
 	}
 
-	return $cellcontents;
+	return $mymeetings;
 }
 
 

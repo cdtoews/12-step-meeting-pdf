@@ -98,8 +98,8 @@ function tsmp_gen_page() {
                <tr valign="top"><th scope="row">Include Type Index?</th>
                    <td>
                      
-                     <input type="radio" name="tsmp_include_index" value="1" <?php echo ((get_option(tsmp_include_index) == 1) ? 'checked' : '')?>  > Yes<br>
-                     <input type="radio" name="tsmp_include_index" value="0" <?php echo ((get_option(tsmp_include_index) == 0) ? 'checked' : '')?> > No</td>
+                     <input type="radio" name="tsmp_include_index" value="1" <?php echo ((get_option('tsmp_include_index') == 1) ? 'checked' : '')?>  > Yes<br>
+                     <input type="radio" name="tsmp_include_index" value="0" <?php echo ((get_option('tsmp_include_index') == 0) ? 'checked' : '')?> > No</td>
                </tr>
 
 

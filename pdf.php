@@ -1,5 +1,6 @@
 <?php
 
+
 	add_action('wp_ajax_step_pdf', function(){
 
 	//must be a logged-in user to run this page (otherwise last_contact will be null)
@@ -178,7 +179,7 @@ function tsmp_create_pdf_table1(){
 function tsmp_create_pdf_columns1(){
 	ob_start();
 	ini_set('max_execution_time', 60);
-
+	require_once('meeting.php');
 
 	settings_fields('tsmp-settings-group');
 	do_settings_sections( 'tsmp-settings-group' );
@@ -200,8 +201,8 @@ function tsmp_create_pdf_columns1(){
 	//load libraries
 
 
-	//run function to attach meeting data to $meetings
-	$meetings = attachPdfMeetingData();
+	//run function get array of meeting objects
+	$mymeetings = attachPdfMeetingData();
 
 	// Extend the TCPDF class to create custom Header and Footer
 	class MYPDF extends TCPDF {
@@ -221,7 +222,7 @@ function tsmp_create_pdf_columns1(){
 
 	//create new PDF
 	
-	$pageLayout = array($page_width, $page_height); //  or array($height, $width)
+	$pageLayout = array($page_width, $page_height);
 	$pdf = new MYPDF("", PDF_UNIT, $pageLayout, true, 'UTF-8', false);
 	$pdf->SetFont('helvetica', '', $font_size);
 
@@ -280,14 +281,15 @@ function tsmp_create_pdf_columns1(){
 	
 	$current_day = "";
 		//loop through meetings 
-	foreach ($meetings as $meeting){
+	foreach ($mymeetings as $mymeeting){
 		$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 		$column_y = $margin_size;
 		// $meeting_header = "";
 		// -------------------------------------------------------------------------
-		if($meeting['formatted_day'] !== $current_day){
-				$current_day = $meeting['formatted_day'];
-				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $meeting['formatted_day'] . "========</font></div>" ;
+		$thisday = $mymeeting->get_formatted_day();
+		if($thisday !== $current_day){
+				$current_day = $thisday;
+				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $thisday . "========</font></div>" ;
 		}else{
 			$meeting_header = "<hr>";
 		}
@@ -295,7 +297,7 @@ function tsmp_create_pdf_columns1(){
 		$start_page = $pdf->getPage();
 		
 		$pdf->startTransaction();
-		$pdf->MultiCell($column_width, 1,  $meeting_header . $meeting['text'], 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+		$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_full_meeting_text() , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 		$end_page = $pdf->getPage();
 		
 		
@@ -305,10 +307,10 @@ function tsmp_create_pdf_columns1(){
 		}else{ //we would have popped to a new page 
 			$pdf = $pdf->rollbackTransaction();
 		
-			if($meeting['formatted_day'] !== $current_day){
-					$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $meeting['formatted_day'] . "========</font></div>" ;
+			if($thisday !== $current_day){
+					$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $thisday . "========</font></div>" ;
 			}else{
-				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $meeting['formatted_day'] . " (cont)========</font></div>" ;
+				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $thisday . " (cont)========</font></div>" ;
 			}
 			$current_column++;
 			
@@ -322,12 +324,12 @@ function tsmp_create_pdf_columns1(){
 			$column_y = $margin_size;
 			$pdf->SetXY($column_x,$column_y, true);
 			//write the text on the new column [and page ]
-			$pdf->MultiCell($column_width, 1, $meeting_header . $meeting['text'] , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
+			$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_full_meeting_text() , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
 			
 		}
 		
 		//set $current_day to the day for the meeting we just printed 
-		$current_day = $meeting['formatted_day'];
+		$current_day = $thisday;
 
 	}
 
