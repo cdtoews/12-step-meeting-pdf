@@ -15,9 +15,14 @@
 	$page_layout = get_option('tsmp_layout');
 	if($page_layout == "table1"){
 		tsmp_create_pdf_table1();
-	}else{
+	}elseif($page_layout == "columns1"){
 		//we'll assume columns1 
-		tsmp_create_pdf_columns1();
+		tsmp_create_pdf_columns(1);
+	}elseif($page_layout == "columns2"){
+		//we'll assume columns1 
+		tsmp_create_pdf_columns(2);
+	}else{
+		echo 'something is wrong, page_layout not specified correctly';
 	}
 
 });
@@ -176,7 +181,7 @@ function tsmp_create_pdf_table1(){
 //                      Make Columns 1
 // ===========================================================================
 
-function tsmp_create_pdf_columns1(){
+function tsmp_create_pdf_columns($layout_type){
 	ob_start();
 	ini_set('max_execution_time', 60);
 	require_once('meeting.php');
@@ -295,9 +300,9 @@ function tsmp_create_pdf_columns1(){
 		}
 		
 		$start_page = $pdf->getPage();
-		
+		//write_log("column width:" . $column_width);
 		$pdf->startTransaction();
-		$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_full_meeting_text() , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+		$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 		$end_page = $pdf->getPage();
 		
 		
@@ -324,7 +329,7 @@ function tsmp_create_pdf_columns1(){
 			$column_y = $margin_size;
 			$pdf->SetXY($column_x,$column_y, true);
 			//write the text on the new column [and page ]
-			$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_full_meeting_text() , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
+			$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
 			
 		}
 		

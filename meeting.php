@@ -2,8 +2,8 @@
 
 class meeting {
 
-  public function __construct(array $meeting_arry) {
-      $this->meeting_array = $meeting_arry;
+  public function __construct(array $meeting_array) {
+      $this->meeting_array = $meeting_array;
       echo 'inside constructor, day is ' . $this->meeting_array['day'] . "\n"; 
   }
 
@@ -27,6 +27,45 @@ class meeting {
     }else{
       return  "Unknown Day";
     }
+  }
+  
+  public function get_text($layout_type){
+    if($layout_type == 1){
+      return $this->get_full_meeting_text();
+    }elseif($layout_type == 2){
+      return $this->get_meeting_table();
+    }
+  }
+  
+  public function get_meeting_table(){
+    $meetingtext = "";
+    $meetingtext .= @$this->meeting_array['name'] . ". ";
+    $meetingtext .= @$this->meeting_array['location'] . ". ";
+    $meetingtext .= @$parts[0] . ". ";
+    $meetingtext .= @$this->meeting_array['notes'] . ". ";
+    $meetingtext .= @$this->meeting_array['location_notes'] . ". ";
+
+    //let's strip carriage returns that might be in location notes and notes
+    $meetingtext = str_replace("\r", "", $meetingtext);
+    $meetingtext = str_replace("\n", "", $meetingtext);
+    $meetingtext = str_replace("\t", "", $meetingtext);
+      
+      $table_text = '
+        <table   width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+        <td rowspan="1" colspan="2" valign="top"><b>' .  $this->get_state() .  ', ' . $this->get_city() . ' ' . $this->meeting_array['time_formatted'] . '</b>
+        </td>
+        </tr>
+        <tr>
+        <td width="30" valign="top"><b>' .   implode (',' , $this->meeting_array['types'])  . '</b><br>
+        </td>
+        <td valign="top">' . $meetingtext . '<br>
+        </td>
+        </tr>
+        </tbody>
+        </table>';
+      return $table_text;
   }
   
   public function get_full_meeting_text(){

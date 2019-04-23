@@ -27,7 +27,7 @@ function tsmp_gen_page() {
                    <select id="tsmp_layout" name="tsmp_layout" value="<?php echo get_option('tsmp_layout'); ?>" />
                       <?php 
                             $tsmp_layout = get_option('tsmp_layout');
-                            $layouts = array("columns1", "table1");
+                            $layouts = array("columns1", "table1");//for now we will leave out 'columns2'
                             foreach ($layouts as $layout) {
                               echo ' <option value="' . $layout   .  '" ' . ($tsmp_layout == $layout ? 'selected' : '') .  '>' . $layout . '</option>';
                             }
