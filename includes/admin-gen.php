@@ -3,10 +3,28 @@
 function tsmp_gen_page() {
 // settings page:
   ?>
+  <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script> 
+  
   <script>
   function setValues(width, height) {
     document.getElementById("tsmp_width").value = width;
     document.getElementById("tsmp_height").value = height;
+  }
+
+  var areas = {  };
+  
+
+  function toggleArea1(id) {
+        area1 = areas[id];
+        if(!area1) {
+                area1 = new nicEditor({externalCSS : 'css/main.css', fullPanel : true}).panelInstance(id ,{hasPanel : true});
+                            
+        } else {
+                area1.removeInstance(id );
+
+                area1 = null;
+        }
+        areas[id] = area1;
   }
 
   </script>
@@ -77,11 +95,13 @@ function tsmp_gen_page() {
                </tr>
                <tr><td colspan="2"><font -2>note on html, each div rendered seperately<br>and column breaks will only fall on close of div</font>
                </td></tr>
-               <tr valign="top"><th scope="row">HTML before meetings</th>
-                   <td><textarea rows="10" cols="70" name="tsmp_intro_html" ><?php echo get_option('tsmp_intro_html'); ?></textarea></td>
+               <tr valign="top"><th scope="row">HTML before meetings<br>
+               <button type=button onclick="toggleArea1('tsmp_intro_html');">Toggle  Editor</button></th>
+                   <td><textarea rows="10" cols="70" id="tsmp_intro_html" name="tsmp_intro_html" ><?php echo get_option('tsmp_intro_html'); ?></textarea></td>
                </tr>
-               <tr valign="top"><th scope="row">HTML after meetings</th>
-                   <td><textarea rows="10" cols="70" name="tsmp_outtro_html" ><?php echo get_option('tsmp_outtro_html'); ?></textarea></td>
+               <tr valign="top"><th scope="row">HTML after meetings<br>
+               <button type=button onclick="toggleArea1('tsmp_outtro_html');">Toggle  Editor</button></th>
+                   <td><textarea rows="10" cols="70" id="tsmp_outtro_html" name="tsmp_outtro_html" ><?php echo get_option('tsmp_outtro_html'); ?></textarea></td>
                </tr>
                <tr valign="top"><th scope="row">Column Count</th>
                    <td><input type="text" name="tsmp_column_count" value="<?php echo get_option('tsmp_column_count'); ?>" /></td>

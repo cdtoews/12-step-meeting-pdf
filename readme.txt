@@ -68,6 +68,9 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 
 == Changelog ==
 
+= 0.1.3 =
+* Some changes to data structure
+
 = 0.1.2 =
 * Parsing state and city from address, not region and sub-region 
 * Included NY Intergroup table format from https://github.com/meeting-guide/nyintergroup
@@ -81,6 +84,9 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 * First Version
 
 == Upgrade Notice ==
+
+= 0.1.3 =
+Version 0.1.3 changes some backend data manipulation
 
 = 0.1.2 =
 Version 0.1.2 parses city and state from address, not region/sub-region. Also
