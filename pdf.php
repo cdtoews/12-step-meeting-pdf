@@ -294,7 +294,7 @@ function tsmp_create_pdf_columns($layout_type){
 		$thisday = $mymeeting->get_formatted_day();
 		if($thisday !== $current_day){
 				$current_day = $thisday;
-				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $thisday . "========</font></div>" ;
+				$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">"  . $thisday . "</font></div>" ;
 		}else{
 			$meeting_header = "<hr>";
 		}
@@ -313,9 +313,10 @@ function tsmp_create_pdf_columns($layout_type){
 			$pdf = $pdf->rollbackTransaction();
 		
 			if($thisday !== $current_day){
-					$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $thisday . "========</font></div>" ;
+				//<div style="background-color:black">
+					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">" . $thisday . "</font></div>" ;
 			}else{
-				$meeting_header =  "<div align=\"center\"><font size=\"+2\">========" . $thisday . " (cont)========</font></div>" ;
+				$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font color=\"white\" size=\"+2\">" . $thisday . " (cont)</font></div>" ;
 			}
 			$current_column++;
 			

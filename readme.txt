@@ -4,7 +4,7 @@ Donate link: https://paypal.me/cdtoews
 Tags: 12 step,12 step meeting, 12 step meetings, meeting list, 12 step meeting list
 Requires at least: 4.7
 Tested up to: 5.1
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -70,6 +70,9 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 
 = 0.1.3 =
 * Some changes to data structure
+* Links to sample PDF's
+* HTML editor in PDF page
+* Javascript to try to stop users from submitting for PDF without saving values
 
 = 0.1.2 =
 * Parsing state and city from address, not region and sub-region 
@@ -86,7 +89,7 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 == Upgrade Notice ==
 
 = 0.1.3 =
-Version 0.1.3 changes some backend data manipulation
+Version 0.1.3 Gives you some sample PDF's as well as an inline HTML editor on the page
 
 = 0.1.2 =
 Version 0.1.2 parses city and state from address, not region/sub-region. Also

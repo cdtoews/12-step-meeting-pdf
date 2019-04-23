@@ -1,27 +1,61 @@
 <?php
 
 function tsmp_gen_page() {
+  require_once('sample_post.php');
 // settings page:
   ?>
   <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script> 
   
   <script>
+  
+  //setup listeners for validation of all fields
+  function setEntryListeners(input) {
+    ["input", "select", "contextmenu", "drop"].forEach(function(event) {
+      input.addEventListener(event, function() {
+        disableGenerate();
+      });
+    });
+  }
+  //generate_warning
+  function disableGenerate(){
+    document.getElementById("submit").disabled = true;
+    document.getElementById("generate_warning").innerHTML = "You Need to click on \"Save Changes\" (Step 1 above) before generating PDF";
+  }
+  
   function setValues(width, height) {
     document.getElementById("tsmp_width").value = width;
     document.getElementById("tsmp_height").value = height;
   }
 
+
+  var samples = {
+    "tsmp_outtro_html": <?php echo json_encode($sample_post); ?>,
+    
+  };
+  
+  function loaddata(filename,textid){
+    var textbox = document.getElementById(textid);
+    textbox.value = samples[filename];
+    
+  }
+
   var areas = {  };
   
-
+//tsmp_outtro_html_load
   function toggleArea1(id) {
         area1 = areas[id];
         if(!area1) {
                 area1 = new nicEditor({externalCSS : 'css/main.css', fullPanel : true}).panelInstance(id ,{hasPanel : true});
-                            
+                var loadbutton = document.getElementById(id + "_load");
+                if(loadbutton){
+                  loadbutton.disabled = true;
+                }
         } else {
                 area1.removeInstance(id );
-
+                var loadbutton = document.getElementById(id + "_load");
+                if(loadbutton){
+                  loadbutton.disabled = false;
+                }
                 area1 = null;
         }
         areas[id] = area1;
@@ -55,7 +89,13 @@ function tsmp_gen_page() {
                  
                  
                  
-                   </select>
+                   </select>&nbsp;&nbsp;&nbsp;&nbsp;
+                   <?php  
+                   echo '<a target="_blank" href="' . plugins_url( '/column1_sample.pdf', __FILE__ ) . '" >Column1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
+                   echo '<a target="_blank" href="' . plugins_url( '/table1_sample.pdf', __FILE__ ) . '" >Table1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
+                   
+                   ?>
+                  
                  </td>
              </tr>
 
@@ -82,16 +122,16 @@ function tsmp_gen_page() {
 
               
                <tr valign="top"><th scope="row">Font Size<font size="-2">(decimals allowed)</font></th>
-                   <td><input type="text" name="tsmp_font_size" value="<?php echo get_option('tsmp_font_size'); ?>" /></td>
+                   <td><input type="text" id="tsmp_font_size" name="tsmp_font_size" value="<?php echo get_option('tsmp_font_size'); ?>" /></td>
                </tr>
                <tr valign="top"><th scope="row">Margin</th>
-                   <td><input type="text" name="tsmp_margin" value="<?php echo get_option('tsmp_margin'); ?>" /></td>
+                   <td><input type="text" id="tsmp_margin" name="tsmp_margin" value="<?php echo get_option('tsmp_margin'); ?>" /></td>
                </tr>
                <tr align="center">
                   <td colspan="2"><h2>Column Variables</h2></td>
                </tr>
                <tr valign="top"><th scope="row">Header Text</th>
-                   <td><input type="text" name="tsmp_header" value="<?php echo get_option('tsmp_header'); ?>" /></td>
+                   <td><input type="text" id="tsmp_header" name="tsmp_header" value="<?php echo get_option('tsmp_header'); ?>" /></td>
                </tr>
                <tr><td colspan="2"><font -2>note on html, each div rendered seperately<br>and column breaks will only fall on close of div</font>
                </td></tr>
@@ -99,27 +139,29 @@ function tsmp_gen_page() {
                <button type=button onclick="toggleArea1('tsmp_intro_html');">Toggle  Editor</button></th>
                    <td><textarea rows="10" cols="70" id="tsmp_intro_html" name="tsmp_intro_html" ><?php echo get_option('tsmp_intro_html'); ?></textarea></td>
                </tr>
-               <tr valign="top"><th scope="row">HTML after meetings<br>
-               <button type=button onclick="toggleArea1('tsmp_outtro_html');">Toggle  Editor</button></th>
+               <tr valign="top"><th scope="row">HTML after meetings<br><br>
+               <button type=button onclick="toggleArea1('tsmp_outtro_html');">Toggle  Editor</button><br><br>
+               <button type=button id="tsmp_outtro_html_load" onclick="loaddata('tsmp_outtro_html','tsmp_outtro_html')" >Load Sample Data</button>
+             </th>
                    <td><textarea rows="10" cols="70" id="tsmp_outtro_html" name="tsmp_outtro_html" ><?php echo get_option('tsmp_outtro_html'); ?></textarea></td>
                </tr>
                <tr valign="top"><th scope="row">Column Count</th>
-                   <td><input type="text" name="tsmp_column_count" value="<?php echo get_option('tsmp_column_count'); ?>" /></td>
+                   <td><input type="text" id="tsmp_column_count" name="tsmp_column_count" value="<?php echo get_option('tsmp_column_count'); ?>" /></td>
                </tr>
                <tr valign="top"><th scope="row">Column Padding</th>
-                   <td><input type="text" name="tsmp_column_padding" value="<?php echo get_option('tsmp_column_padding'); ?>" /></td>
+                   <td><input type="text" id="tsmp_column_padding" name="tsmp_column_padding" value="<?php echo get_option('tsmp_column_padding'); ?>" /></td>
                </tr>
                <tr align="center">
                   <td colspan="2"><h2>Table Variables</h2></td>
                </tr>
                <tr valign="top"><th scope="row">Starting Page Number</th>
-                   <td><input type="text" name="tsmp_first_page_no" value="<?php echo get_option('tsmp_first_page_no'); ?>" /></td>
+                   <td><input type="text" id="tsmp_first_page_no" name="tsmp_first_page_no" value="<?php echo get_option('tsmp_first_page_no'); ?>" /></td>
                </tr>
                <tr valign="top"><th scope="row">Include Type Index?</th>
                    <td>
                      
-                     <input type="radio" name="tsmp_include_index" value="1" <?php echo ((get_option('tsmp_include_index') == 1) ? 'checked' : '')?>  > Yes<br>
-                     <input type="radio" name="tsmp_include_index" value="0" <?php echo ((get_option('tsmp_include_index') == 0) ? 'checked' : '')?> > No</td>
+                     <input id="include_radio1" type="radio" name="tsmp_include_index" value="1" <?php echo ((get_option('tsmp_include_index') == 1) ? 'checked' : '')?>  > Yes<br>
+                     <input id="include_radio2" type="radio" name="tsmp_include_index" value="0" <?php echo ((get_option('tsmp_include_index') == 0) ? 'checked' : '')?> > No</td>
                </tr>
 
 
@@ -148,11 +190,32 @@ if(1==2){
      <input name="action" value="step_pdf" type="hidden">
 <div class="form-group"> <label class="col-md-4 control-label" for="submit"></label>
 step 2 <div class="col-md-4"> <button id="submit"
-name="submit" class="button-primary" >Generate PDF</button>
+name="submit" class="button-primary" >Generate PDF</button><div id="generate_warning"></div>
 </form>
    </div>
  </div>
 </div>
+<script>
+
+
+//setup the listners to disable generate button
+setEntryListeners(document.getElementById("tsmp_layout"));
+setEntryListeners(document.getElementById("tsmp_width"));
+setEntryListeners(document.getElementById("tsmp_height"));
+setEntryListeners(document.getElementById("tsmp_font_size"));
+setEntryListeners(document.getElementById("tsmp_margin"));
+setEntryListeners(document.getElementById("tsmp_header"));
+setEntryListeners(document.getElementById("tsmp_outtro_html"));
+setEntryListeners(document.getElementById("tsmp_column_count"));
+setEntryListeners(document.getElementById("tsmp_column_padding"));
+setEntryListeners(document.getElementById("tsmp_first_page_no"));
+setEntryListeners(document.getElementById("include_radio1"));
+setEntryListeners(document.getElementById("include_radio2"));
+
+</script
+
+
+
   <?php
 
 }
