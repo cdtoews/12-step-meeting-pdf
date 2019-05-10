@@ -68,6 +68,11 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 
 == Changelog ==
 
+= 0.1.4 =
+* fixed floating footer on admin page
+* hiding variables on page if different format selected (in process)
+* automagically determining optimal font size for # of pages desired
+
 = 0.1.3 =
 * Some changes to data structure
 * Links to sample PDF's

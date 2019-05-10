@@ -61,6 +61,39 @@ function tsmp_gen_page() {
         areas[id] = area1;
   }
 
+
+  function updateVarView(){
+    //let's determine which to hide and which to show
+    //read id tsmp_layout
+    var x = document.getElementById("tsmp_layout").selectedIndex;
+    var dropDownValue = document.getElementsByTagName("option")[x].value;
+    
+    var divsToHide;
+    var divsToShow;
+    if (dropDownValue.startsWith("column")){
+      divsToHide = document.getElementsByClassName("table_row"); 
+      divsToShow = document.getElementsByClassName("column_row"); 
+    } else if (dropDownValue.startsWith("table")){
+      divsToHide = document.getElementsByClassName("column_row"); 
+      divsToShow = document.getElementsByClassName("table_row"); 
+    }else{
+      alert("what is going on?");
+    }
+    
+    
+    
+    for(var i = 0; i < divsToHide.length; i++){
+        divsToHide[i].style.display = "none"; // depending on what you're doing
+    }
+    for(var i = 0; i < divsToShow.length; i++){
+        divsToShow[i].style.display = ""; // depending on what you're doing
+    }
+    
+    
+    
+  }
+
+
   </script>
 
   <div class="wrap">
@@ -76,7 +109,7 @@ function tsmp_gen_page() {
                   </span>
                 </th>
                  <td>
-                   <select id="tsmp_layout" name="tsmp_layout" value="<?php echo get_option('tsmp_layout'); ?>" />
+                   <select onchange="updateVarView()" id="tsmp_layout" name="tsmp_layout" value="<?php echo get_option('tsmp_layout'); ?>" />
                       <?php 
                             $tsmp_layout = get_option('tsmp_layout');
                             $layouts = array("columns1", "table1");//for now we will leave out 'columns2'
@@ -127,37 +160,37 @@ function tsmp_gen_page() {
                <tr valign="top"><th scope="row">Margin</th>
                    <td><input type="text" id="tsmp_margin" name="tsmp_margin" value="<?php echo get_option('tsmp_margin'); ?>" /></td>
                </tr>
-               <tr align="center">
+               <tr class="column_row" align="center">
                   <td colspan="2"><h2>Column Variables</h2></td>
                </tr>
-               <tr valign="top"><th scope="row">Header Text</th>
+               <tr class="column_row"  valign="top"><th scope="row">Header Text</th>
                    <td><input type="text" id="tsmp_header" name="tsmp_header" value="<?php echo get_option('tsmp_header'); ?>" /></td>
                </tr>
-               <tr><td colspan="2"><font -2>note on html, each div rendered seperately<br>and column breaks will only fall on close of div</font>
+               <tr class="column_row" ><td colspan="2"><font -2>note on html, each div rendered seperately<br>and column breaks will only fall on close of div</font>
                </td></tr>
-               <tr valign="top"><th scope="row">HTML before meetings<br>
+               <tr class="column_row"  valign="top"><th scope="row">HTML before meetings<br>
                <button type=button onclick="toggleArea1('tsmp_intro_html');">Toggle  Editor</button></th>
                    <td><textarea rows="10" cols="70" id="tsmp_intro_html" name="tsmp_intro_html" ><?php echo get_option('tsmp_intro_html'); ?></textarea></td>
                </tr>
-               <tr valign="top"><th scope="row">HTML after meetings<br><br>
+               <tr class="column_row"  valign="top"><th scope="row">HTML after meetings<br><br>
                <button type=button onclick="toggleArea1('tsmp_outtro_html');">Toggle  Editor</button><br><br>
                <button type=button id="tsmp_outtro_html_load" onclick="loaddata('tsmp_outtro_html','tsmp_outtro_html')" >Load Sample Data</button>
              </th>
                    <td><textarea rows="10" cols="70" id="tsmp_outtro_html" name="tsmp_outtro_html" ><?php echo get_option('tsmp_outtro_html'); ?></textarea></td>
                </tr>
-               <tr valign="top"><th scope="row">Column Count</th>
+               <tr class="column_row"  valign="top"><th scope="row">Column Count</th>
                    <td><input type="text" id="tsmp_column_count" name="tsmp_column_count" value="<?php echo get_option('tsmp_column_count'); ?>" /></td>
                </tr>
-               <tr valign="top"><th scope="row">Column Padding</th>
+               <tr class="column_row"  valign="top"><th scope="row">Column Padding</th>
                    <td><input type="text" id="tsmp_column_padding" name="tsmp_column_padding" value="<?php echo get_option('tsmp_column_padding'); ?>" /></td>
                </tr>
-               <tr align="center">
+               <tr  class="table_row" align="center">
                   <td colspan="2"><h2>Table Variables</h2></td>
                </tr>
-               <tr valign="top"><th scope="row">Starting Page Number</th>
+               <tr class="table_row"  valign="top"><th scope="row">Starting Page Number</th>
                    <td><input type="text" id="tsmp_first_page_no" name="tsmp_first_page_no" value="<?php echo get_option('tsmp_first_page_no'); ?>" /></td>
                </tr>
-               <tr valign="top"><th scope="row">Include Type Index?</th>
+               <tr class="table_row"  class="table_row"  valign="top"><th scope="row">Include Type Index?</th>
                    <td>
                      
                      <input id="include_radio1" type="radio" name="tsmp_include_index" value="1" <?php echo ((get_option('tsmp_include_index') == 1) ? 'checked' : '')?>  > Yes<br>
@@ -191,9 +224,9 @@ if(1==2){
 <div class="form-group"> <label class="col-md-4 control-label" for="submit"></label>
 step 2 <div class="col-md-4"> <button id="submit"
 name="submit" class="button-primary" >Generate PDF</button><div id="generate_warning"></div>
-</form>
    </div>
  </div>
+    </form>
 </div>
 <script>
 
@@ -211,8 +244,8 @@ setEntryListeners(document.getElementById("tsmp_column_padding"));
 setEntryListeners(document.getElementById("tsmp_first_page_no"));
 setEntryListeners(document.getElementById("include_radio1"));
 setEntryListeners(document.getElementById("include_radio2"));
-
-</script
+updateVarView()
+</script>
 
 
 
