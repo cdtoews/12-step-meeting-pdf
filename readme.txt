@@ -58,9 +58,17 @@ Yes, Any meetings you want included in the printed list, and not included in the
 * Starting Page Number: (table layout only) Let's you choose starting page number if you have other pages you will attach 
 * Include Type Index: (table layout only) Let's you include type index at the end of pdf
 
-= I enter values in the boxes, and then try to generate PDF, why aren't my values on the PDF? =
+= How do I determine the best font size to fit all meetings on 2 pages =
 
-You need to click "Save Changes" after you enter any changes. Saving changes puts the values in the database, and the PDF generator pulls those values from the database
+in version 0.1.6 there is a somewhat experimental feature that determines the optimal font size. The optimal font size is the size at which adding 0.1 to it would make a page greater than your desired page count.
+I use this to make a 2 page list, so I can print it double sided and use a single page.
+What it does:
+* takes the currently set font size and makes a pdf and sees how many pages it is
+* If the page count is equal to or less then the desired page count, it increases the font size a certain amount
+* If the page count is greater than the desired page count, it decreases the font size a certain amount
+* Once it increases and decreases it will find the largest font size that will fit on the desired page count
+* This can take 30-60 seconds since it is making multiple PDF's to check sizes
+* Once it determines the optimal font size, it sets that font size in your settings, and makes your PDF
 
 == Screenshots ==
 
