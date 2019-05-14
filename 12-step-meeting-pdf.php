@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/cdtoews/12-step-meeting-pdf
  * Description: Create PDF meeting list from the 12 Step Meeting List Plugin
  * code forked from https://github.com/meeting-guide/nyintergroup
- * Version: 0.1.3
+ * Version: 0.1.5
  * Author: Chris Toews
  * Author URI: https://yourtechguys.info
  * Text Domain: 12-step-meeting-pdf
@@ -17,6 +17,7 @@
 	custom font
 	*/
 
+
  if (!defined('TSMP_CONTACT_EMAIL')) define('TSMP_CONTACT_EMAIL', 'chris@yourtechguys.info');
  if (!defined('TSMP_PATH')) define('TSMP_PATH', plugin_dir_path(__FILE__));
  if (!defined('TSMP_VERSION')) define('TSMP_VERSION', '0.1.0');
@@ -24,6 +25,10 @@
 
  if ( ! function_exists('write_log')) {
     function write_log ( $log )  {
+       $tsmp_debug = false;
+       if(!$tsmp_debug){
+         return;
+       }
        if ( is_array( $log ) || is_object( $log ) ) {
           error_log( print_r( $log, true ) );
        } else {

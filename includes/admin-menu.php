@@ -24,9 +24,15 @@ function tsmp_options_init(){
                       );
     register_setting( 'tsmp-settings-group', 'tsmp_font_size', array(
                                       'type' => 'number',
-                                      'default' => 7.6,
+                                      'default' => 7,
                                       )
                       );
+    register_setting( 'tsmp-settings-group', 'tsmp_header_font_size', array(
+                                      'type' => 'number',
+                                      'default' => 9,
+                                      )
+                      );
+                      
     register_setting( 'tsmp-settings-group', 'tsmp_column_count', array(
                                       'type' => 'integer',
                                       'default' => 4,
@@ -65,6 +71,16 @@ function tsmp_options_init(){
       register_setting( 'tsmp-settings-group', 'tsmp_include_index', array(
                                         'type' => 'integer',
                                         'default' => 1,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_auto_font', array(
+                                        'type' => 'integer',
+                                        'default' => 0,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_desired_page_count', array(
+                                        'type' => 'integer',
+                                        'default' => 2,
                                         )
                         );
       }

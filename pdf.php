@@ -11,21 +11,124 @@
 	}
 	
 	require_once('vendor/autoload.php');
-	
+	// Extend the TCPDF class to create custom Header and Footer
+	class COLUMNPDF extends TCPDF {
+		//Page header
+		public function Header() {
+			$header_text = get_option('tsmp_header');
+
+			if ($header_text != "") {
+				// Set font
+				$header_font_size = get_option("tsmp_header_font_size");
+				$this->SetFont('helvetica', 'B', $header_font_size);
+
+				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
+			}
+		}
+	}//end of class 
 	$page_layout = get_option('tsmp_layout');
+	$tsmp_auto_font = get_option('tsmp_auto_font');
+	if($tsmp_auto_font == 1 && $page_layout == "columns1"){
+		//EXPERIMENTAL
+		$optimal_size = NULL;
+		$current_size = abs(get_option('tsmp_font_size'));
+		$over = NULL;
+		$under = NULL;
+		$desired_page_count = get_option('tsmp_desired_page_count');
+		$loop_counter = 0;
+		do{
+			
+			//first let's get a pdf and see what size it is 
+			$pdf = tsmp_create_pdf_columns(1, $current_size); //when we add columns2, we'll need to take that into consideration
+			$number_of_pages = $pdf->getPage();
+			
+			
+			if($number_of_pages < $desired_page_count){
+				//more than 1 page off, 
+				if(is_null($under) || $current_size > $under){
+					$under = $current_size;
+					$current_size = round(($current_size * 1.5) , 1);
+				}else{
+					//we shouldn't get here, 
+					write_log("##################  more than 1 page off, and current is not less than under");
+				}
+			}elseif($number_of_pages == $desired_page_count){
+				if(is_null($under) || $current_size > $under){
+					$under = $current_size;
+					if(is_null($over)) {
+						$current_size = round(($current_size * 1.25) , 1);
+					}elseif(round(($over - $under ),1) == 0.1){
+						//success
+						write_log("optimal is " . $under);
+						$optimal_size = $under;
+					}else{
+						//let's narrow the gap 
+						$current_size = $current_size + round( ( ($over - $under) / 2),1);
+					}
+					
+				}else{
+					//we shouldn't get here 
+					write_log("##################  page count is optimal, but somehting is weird");
+				}
+			}elseif($number_of_pages > $desired_page_count){
+				if(is_null($over) || $current_size < $over){
+					$over = $current_size;
+				}
+				if(is_null($under)){
+					$current_size = round(($current_size * .75) , 1);
+				}elseif(round(($over - $under ),1) == 0.1){
+					//success 
+					write_log("optimal is " . $under);
+					$optimal_size = $under;
+				}else{
+					$current_size = $current_size - round( ( ($over - $under) / 2),1);
+				}
+					
+			}else{
+				//we shouldn't get here 
+				write_log("################## D'OH! having trouble comparing page counts");
+			}
+			$output = "loop#" .  ++$loop_counter . "  ";
+			$output .= "pages:" . $number_of_pages . "  ";
+			$output .= "under:" . $under . "  ";
+			$output .= "over:" . $over . "  ";
+			$output .= "current:" . $current_size . "  ";
+			$output .= "difference is: " . ($over - $under) . "  ";
+			
+			write_log($output);
+			if($loop_counter > 22){
+				write_log("over 22 times around the block");
+				$optimal_size = -1;
+			}
+		}while(is_null($optimal_size) );
+		
+		
+		update_option('tsmp_auto_font',0);//set auto-font-size back to nyet
+		update_option('tsmp_font_size',$optimal_size);
+		write_log("found optimal font size, " . $optimal_size);
+	}
+	
+	
+	
+	
+
 	if($page_layout == "table1"){
 		tsmp_create_pdf_table1();
 	}elseif($page_layout == "columns1"){
-		//we'll assume columns1 
-		tsmp_create_pdf_columns(1);
+		$pdf = tsmp_create_pdf_columns(1, NULL);
+		$pdf->Output('meeting_list.pdf', 'I');
+		exit;
 	}elseif($page_layout == "columns2"){
-		//we'll assume columns1 
-		tsmp_create_pdf_columns(2);
+		$pdf = tsmp_create_pdf_columns(2, NULL);
+		$pdf->Output('meeting_list.pdf', 'I');
+		exit;
 	}else{
 		echo 'something is wrong, page_layout not specified correctly';
 	}
 
 });
+
+
 
 // ==========================================================================
 //                        Make Table1
@@ -52,6 +155,7 @@ function tsmp_create_pdf_table1(){
 	
 	$margin_size = get_option('tsmp_margin');
 	$font_size = get_option('tsmp_font_size');
+	$header_font_size = get_option("tsmp_header_font_size");
 	$number_of_columns = get_option('tsmp_column_count');
 	$column_padding = get_option('tsmp_column_padding');
 	$outtro_text = get_option('tsmp_outtro_html');
@@ -70,12 +174,12 @@ function tsmp_create_pdf_table1(){
 	$table_padding		= 1.8; //in mm
 	$header_top			= 9;
 	$footer_bottom 		= -15;
-	$font_header			= array('helvetica', 'b', 18);
-	$font_footer			= array('helvetica', 'r', 10);
-	$font_table_header	= array('helvetica', 'b', 8);
-	$font_table_rows		= array('dejavusans', 'r', 6.4); //for the unicode character
-	$font_index_header	= array('helvetica', 'b', 9);
-	$font_index_rows		= array('helvetica', 'r', 6);
+	//$font_header			= array('helvetica', 'b', 18);
+	// $font_footer			= array('helvetica', 'r', 10);
+	// $font_table_header	= array('helvetica', 'b', 8);
+	// $font_table_rows		= array('dejavusans', 'r', 6.4); //for the unicode character
+	$font_index_header	= array('helvetica', 'b', $header_font_size);
+	$font_index_rows		= array('helvetica', 'r', $font_size);
 
 
 	$line_height_ratio	= 2.87;
@@ -175,13 +279,11 @@ function tsmp_create_pdf_table1(){
 }
 
 
-
-
 // ===========================================================================
 //                      Make Columns 1
 // ===========================================================================
 
-function tsmp_create_pdf_columns($layout_type){
+function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	ob_start();
 	ini_set('max_execution_time', 60);
 	require_once('meeting.php');
@@ -191,7 +293,11 @@ function tsmp_create_pdf_columns($layout_type){
 
 	//need to add variable validation for mortals
 	$margin_size = get_option('tsmp_margin');
-	$font_size = get_option('tsmp_font_size');
+	if(is_null($arg_font_size)){
+		$font_size = get_option('tsmp_font_size');
+	}else{
+		$font_size = $arg_font_size;
+	}
 	$number_of_columns = get_option('tsmp_column_count');
 	$column_padding = get_option('tsmp_column_padding');
 	$outtro_text = get_option('tsmp_outtro_html');
@@ -209,26 +315,12 @@ function tsmp_create_pdf_columns($layout_type){
 	//run function get array of meeting objects
 	$mymeetings = attachPdfMeetingData();
 
-	// Extend the TCPDF class to create custom Header and Footer
-	class MYPDF extends TCPDF {
 
-		//Page header
-		public function Header() {
-			$header_text = get_option('tsmp_header');
-
-			if ($header_text != "") {
-				// Set font
-				$this->SetFont('helvetica', 'B', 15);
-
-				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
-			}
-		}
-	}//end of class 
 
 	//create new PDF
 	
 	$pageLayout = array($page_width, $page_height);
-	$pdf = new MYPDF("", PDF_UNIT, $pageLayout, true, 'UTF-8', false);
+	$pdf = new COLUMNPDF("", PDF_UNIT, $pageLayout, true, 'UTF-8', false);
 	$pdf->SetFont('helvetica', '', $font_size);
 
 	$pdf->SetMargins($margin_size, $margin_size, $margin_size, true);
@@ -378,10 +470,11 @@ function tsmp_create_pdf_columns($layout_type){
 		}//end of Loop
 	}//end of if
 
+	//write_log("number of pages: " . $pdf->getPage());
 	//this seems to make php happy:
 	ob_end_clean();
-	$pdf->Output('meeting_list.pdf', 'I');
-
-	exit;
+	//$pdf->Output('meeting_list.pdf', 'I');
+	return $pdf;
+	//exit;
 	
 }

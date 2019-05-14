@@ -4,7 +4,7 @@ Donate link: https://paypal.me/cdtoews
 Tags: 12 step,12 step meeting, 12 step meetings, meeting list, 12 step meeting list
 Requires at least: 4.7
 Tested up to: 5.2
-Stable tag: 0.1.4
+Stable tag: 0.1.5
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -68,10 +68,13 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 
 == Changelog ==
 
+= 0.1.5 =
+* bug fix for editors not loading in https
+
 = 0.1.4 =
 * fixed floating footer on admin page
 * hiding variables on page if different format selected
-* automagically determining optimal font size for # of pages desired (in process)
+* option to auto-determine optimal font size for # of pages desired, column layout only
 
 = 0.1.3 =
 * Some changes to data structure
@@ -92,6 +95,12 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 * First Version
 
 == Upgrade Notice ==
+
+= 0.1.5 =
+Version 0.1.5 bug fix for editors not loading
+
+= 0.1.4 =
+Version 0.1.4 fixes floating footer, hides unused settings, and auto-determine optimal font size for desired number of pages
 
 = 0.1.3 =
 Version 0.1.3 Gives you some sample PDF's as well as an inline HTML editor on the page

@@ -4,7 +4,7 @@ function tsmp_gen_page() {
   require_once('sample_post.php');
 // settings page:
   ?>
-  <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script> 
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/NicEdit/0.93/nicEdit.js"></script> 
   
   <script>
   
@@ -25,6 +25,7 @@ function tsmp_gen_page() {
   function setValues(width, height) {
     document.getElementById("tsmp_width").value = width;
     document.getElementById("tsmp_height").value = height;
+    disableGenerate();
   }
 
 
@@ -116,19 +117,12 @@ function tsmp_gen_page() {
                             foreach ($layouts as $layout) {
                               echo ' <option value="' . $layout   .  '" ' . ($tsmp_layout == $layout ? 'selected' : '') .  '>' . $layout . '</option>';
                             }
-                      
-                      
                        ?>
-                 
-                 
-                 
                    </select>&nbsp;&nbsp;&nbsp;&nbsp;
                    <?php  
-                   echo '<a target="_blank" href="' . plugins_url( '/column1_sample.pdf', __FILE__ ) . '" >Column1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
-                   echo '<a target="_blank" href="' . plugins_url( '/table1_sample.pdf', __FILE__ ) . '" >Table1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
-                   
+                     echo '<a target="_blank" href="' . plugins_url( '/column1_sample.pdf', __FILE__ ) . '" >Column1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
+                     echo '<a target="_blank" href="' . plugins_url( '/table1_sample.pdf', __FILE__ ) . '" >Table1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
                    ?>
-                  
                  </td>
              </tr>
 
@@ -157,6 +151,25 @@ function tsmp_gen_page() {
                <tr valign="top"><th scope="row">Font Size<font size="-2">(decimals allowed)</font></th>
                    <td><input type="text" id="tsmp_font_size" name="tsmp_font_size" value="<?php echo get_option('tsmp_font_size'); ?>" /></td>
                </tr>
+               <tr valign="top"><th scope="row">Header Font Size<font size="-2">(decimals allowed)</font></th>
+                   <td><input type="text" id="tsmp_header_font_size" name="tsmp_header_font_size" value="<?php echo get_option('tsmp_header_font_size'); ?>" /></td>
+               </tr>
+               
+               <tr class="column_row"  valign="top"><th scope="row"></th>
+                   <td bgcolor="#FFFFFF">
+                     EXPERIMENTAL:<br>
+                     <input type="checkbox" id="tsmp_auto_font" name="tsmp_auto_font" value="1" <?php echo ( (get_option('tsmp_auto_font') == 1) ? "checked": ""); ?>
+                      checked( 1, $options['checkbox_example'], false ) />
+                    <label for="tsmp_auto_font">Automatically determine optimal Font Size</label><br>
+                    <input size="2" type="text" id="tsmp_desired_page_count" name="tsmp_desired_page_count" value="<?php echo get_option('tsmp_desired_page_count'); ?>" />
+                    <label for="tsmp_desired_page_count">Desired page count</label><br>
+                    <font size="-2"> This is for columns layout only. It will start with the set font size, and try to establish the optimal font size for the desired page count.<br>
+                      optimal font size being defined as (optimal_font_size + 0.1) would result in (desired page count +1)<br>
+                      once the optimal size is determined, the size is set for future, and the PDF is generated<br>
+                      This process can take 30-60 seconds to complete</font>
+                   </td>
+               </tr>
+               
                <tr valign="top"><th scope="row">Margin</th>
                    <td><input type="text" id="tsmp_margin" name="tsmp_margin" value="<?php echo get_option('tsmp_margin'); ?>" /></td>
                </tr>
@@ -236,6 +249,7 @@ setEntryListeners(document.getElementById("tsmp_layout"));
 setEntryListeners(document.getElementById("tsmp_width"));
 setEntryListeners(document.getElementById("tsmp_height"));
 setEntryListeners(document.getElementById("tsmp_font_size"));
+setEntryListeners(document.getElementById("tsmp_header_font_size"));
 setEntryListeners(document.getElementById("tsmp_margin"));
 setEntryListeners(document.getElementById("tsmp_header"));
 setEntryListeners(document.getElementById("tsmp_outtro_html"));
@@ -244,6 +258,8 @@ setEntryListeners(document.getElementById("tsmp_column_padding"));
 setEntryListeners(document.getElementById("tsmp_first_page_no"));
 setEntryListeners(document.getElementById("include_radio1"));
 setEntryListeners(document.getElementById("include_radio2"));
+setEntryListeners(document.getElementById("tsmp_auto_font"));
+setEntryListeners(document.getElementById("tsmp_desired_page_count"));
 updateVarView()
 </script>
 
