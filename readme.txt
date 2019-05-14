@@ -4,7 +4,7 @@ Donate link: https://paypal.me/cdtoews
 Tags: 12 step,12 step meeting, 12 step meetings, meeting list, 12 step meeting list
 Requires at least: 4.7
 Tested up to: 5.2
-Stable tag: 0.1.5
+Stable tag: 0.1.6
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -68,7 +68,7 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 
 == Changelog ==
 
-= 0.1.5 =
+= 0.1.6 =
 * bug fix for editors not loading in https
 
 = 0.1.4 =
@@ -96,7 +96,7 @@ You need to click "Save Changes" after you enter any changes. Saving changes put
 
 == Upgrade Notice ==
 
-= 0.1.5 =
+= 0.1.6 =
 Version 0.1.5 bug fix for editors not loading
 
 = 0.1.4 =

@@ -2,10 +2,13 @@
 
 function tsmp_gen_page() {
   require_once('sample_post.php');
-// settings page:
+// settings page
+
+  // https://cdnjs.cloudflare.com/ajax/libs/NicEdit/0.93/nicEdit.js
   ?>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/NicEdit/0.93/nicEdit.js"></script> 
-  
+
+  <script type="text/javascript" src="<?php echo plugins_url( 'js/nicedit.js', __FILE__ ) ; ?>"></script> 
+   	
   <script>
   
   //setup listeners for validation of all fields
