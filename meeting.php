@@ -4,7 +4,7 @@ class meeting {
 
   public function __construct(array $meeting_array) {
       $this->meeting_array = $meeting_array;
-      echo 'inside constructor, day is ' . $this->meeting_array['day'] . "\n"; 
+      echo 'inside constructor, day is ' . $this->meeting_array['day'] . "\n";
   }
 
   public function get_formatted_day(){
@@ -28,7 +28,7 @@ class meeting {
       return  "Unknown Day";
     }
   }
-  
+
   public function get_text($layout_type){
     if($layout_type == 1){
       return $this->get_full_meeting_text();
@@ -36,7 +36,7 @@ class meeting {
       return $this->get_meeting_table();
     }
   }
-  
+
   public function get_meeting_table(){
     $meetingtext = "";
     $meetingtext .= @$this->meeting_array['name'] . ". ";
@@ -49,7 +49,7 @@ class meeting {
     $meetingtext = str_replace("\r", "", $meetingtext);
     $meetingtext = str_replace("\n", "", $meetingtext);
     $meetingtext = str_replace("\t", "", $meetingtext);
-      
+
       $table_text = '
         <table   width="100%" border="0" cellspacing="0" cellpadding="0">
         <tbody>
@@ -67,9 +67,9 @@ class meeting {
         </table>';
       return $table_text;
   }
-  
+
   public function get_full_meeting_text(){
-    //cobble the meeting text together
+    //cobble the meeting text togethers
     @$parts = explode(', ', $this->meeting_array['formatted_address']);
     $meetingtext = "";
     $meetingtext .= "<font='+1'><b>" . $this->get_state() . " ";
@@ -79,8 +79,15 @@ class meeting {
     $meetingtext .= @$this->meeting_array['name'] . ". ";
     $meetingtext .= @$this->meeting_array['location'] . ". ";
     $meetingtext .= @$parts[0] . ". ";
-    $meetingtext .= @$this->meeting_array['notes'] . ". ";
-    $meetingtext .= @$this->meeting_array['location_notes'] . ". ";
+
+    //let's only add notes and location notes if they exists. this was adding extra punctuation
+    if(strlen(@$this->meeting_array['notes']) > 0){
+      $meetingtext .= @$this->meeting_array['notes'] . ". ";
+    }
+    if(strlen(@$this->meeting_array['location_notes']) > 0){
+      $meetingtext .= @$this->meeting_array['location_notes'] . ". ";
+    }
+
 
     //let's strip carriage returns that might be in location notes and notes
     $meetingtext = str_replace("\r", "", $meetingtext);
@@ -88,7 +95,7 @@ class meeting {
     $meetingtext = str_replace("\t", "", $meetingtext);
     return $meetingtext;
   }
-  
+
   public function get_state(){
     $formatted_adddress = @$this->meeting_array['formatted_address'];
     $address_split = explode(", ", $formatted_adddress);

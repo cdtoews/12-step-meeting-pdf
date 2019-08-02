@@ -9,7 +9,7 @@
 	} elseif (!current_user_can('edit_posts')) {
 		die('you do not have access to view this page');
 	}
-	
+
 	require_once('vendor/autoload.php');
 	// Extend the TCPDF class to create custom Header and Footer
 	class COLUMNPDF extends TCPDF {
@@ -25,7 +25,8 @@
 				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
 			}
 		}
-	}//end of class 
+	}//end of class
+
 	$page_layout = get_option('tsmp_layout');
 	$tsmp_auto_font = get_option('tsmp_auto_font');
 	if($tsmp_auto_font == 1 && $page_layout == "columns1"){
@@ -37,19 +38,19 @@
 		$desired_page_count = get_option('tsmp_desired_page_count');
 		$loop_counter = 0;
 		do{
-			
-			//first let's get a pdf and see what size it is 
+
+			//first let's get a pdf and see what size it is
 			$pdf = tsmp_create_pdf_columns(1, $current_size); //when we add columns2, we'll need to take that into consideration
 			$number_of_pages = $pdf->getPage();
-			
-			
+
+
 			if($number_of_pages < $desired_page_count){
-				//more than 1 page off, 
+				//more than 1 page off,
 				if(is_null($under) || $current_size > $under){
 					$under = $current_size;
 					$current_size = round(($current_size * 1.5) , 1);
 				}else{
-					//we shouldn't get here, 
+					//we shouldn't get here,
 					write_log("##################  more than 1 page off, and current is not less than under");
 				}
 			}elseif($number_of_pages == $desired_page_count){
@@ -62,12 +63,12 @@
 						write_log("optimal is " . $under);
 						$optimal_size = $under;
 					}else{
-						//let's narrow the gap 
+						//let's narrow the gap
 						$current_size = $current_size + round( ( ($over - $under) / 2),1);
 					}
-					
+
 				}else{
-					//we shouldn't get here 
+					//we shouldn't get here
 					write_log("##################  page count is optimal, but somehting is weird");
 				}
 			}elseif($number_of_pages > $desired_page_count){
@@ -77,15 +78,15 @@
 				if(is_null($under)){
 					$current_size = round(($current_size * .75) , 1);
 				}elseif(round(($over - $under ),1) == 0.1){
-					//success 
+					//success
 					write_log("optimal is " . $under);
 					$optimal_size = $under;
 				}else{
 					$current_size = $current_size - round( ( ($over - $under) / 2),1);
 				}
-					
+
 			}else{
-				//we shouldn't get here 
+				//we shouldn't get here
 				write_log("################## D'OH! having trouble comparing page counts");
 			}
 			$output = "loop#" .  ++$loop_counter . "  ";
@@ -94,23 +95,23 @@
 			$output .= "over:" . $over . "  ";
 			$output .= "current:" . $current_size . "  ";
 			$output .= "difference is: " . ($over - $under) . "  ";
-			
+
 			write_log($output);
 			if($loop_counter > 22){
 				write_log("over 22 times around the block");
 				$optimal_size = -1;
 			}
 		}while(is_null($optimal_size) );
-		
-		
+
+
 		update_option('tsmp_auto_font',0);//set auto-font-size back to nyet
 		update_option('tsmp_font_size',$optimal_size);
 		write_log("found optimal font size, " . $optimal_size);
 	}
-	
-	
-	
-	
+
+
+
+
 
 	if($page_layout == "table1"){
 		tsmp_create_pdf_table1();
@@ -136,10 +137,10 @@
 
 
 function tsmp_create_pdf_table1(){
-	global $wpdb, $margins, $font_table_rows, $page_width, $page_height, $table_padding, $font_header, 
-	$header_top, $font_footer, $footer_bottom, $first_column_width, $table_border_width, $font_table_rows, 
-	$table_padding, $font_table_header, $first_column_width, $day_column_width, $table_border_width, $font_table_rows, 
-	$table_padding, $first_column_width, $day_column_width, $table_border_width, $inner_page_height, $font_table_rows, 
+	global $wpdb, $margins, $font_table_rows, $page_width, $page_height, $table_padding, $font_header,
+	$header_top, $font_footer, $footer_bottom, $first_column_width, $table_border_width, $font_table_rows,
+	$table_padding, $font_table_header, $first_column_width, $day_column_width, $table_border_width, $font_table_rows,
+	$table_padding, $first_column_width, $day_column_width, $table_border_width, $inner_page_height, $font_table_rows,
 	$index, $exclude_from_indexes, $zip_codes, $table_padding, $line_height_ratio;
 	//must be a logged-in user to run this page (otherwise last_contact will be null)
 	if (!is_user_logged_in()) {
@@ -147,12 +148,12 @@ function tsmp_create_pdf_table1(){
 	} elseif (!current_user_can('edit_posts')) {
 		die('you do not have access to view this page');
 	}
-	
+
 	ini_set('max_execution_time', 60);
 	//output PDF of NYC meeting list using the TCPDF library
 	//don't show these in indexes
 	$exclude_from_indexes	= array('Beginner', 'Candlelight', 'Closed', 'Grapevine', 'Literature', 'Open', 'Topic Discussion');
-	
+
 	$margin_size = get_option('tsmp_margin');
 	$font_size = get_option('tsmp_font_size');
 	$header_font_size = get_option("tsmp_header_font_size");
@@ -162,10 +163,10 @@ function tsmp_create_pdf_table1(){
 	$intro_text = get_option('tsmp_intro_html');
 	$page_width = get_option('tsmp_width');
 	$page_height = get_option('tsmp_height');
-	
-	
+
+
 	$first_page_no = 1;
-	
+
 	//config dimensions, in inches
 	$table_border_width		= .1;
 	//convert dimensions to mm
@@ -185,8 +186,8 @@ function tsmp_create_pdf_table1(){
 	$line_height_ratio	= 2.87;
 	$index_width			= 57; // in mm
 	$table_gap			= .25 * $inch_converter; //gap between tables
-	
-	
+
+
 	$inner_page_width		= $page_width - ($margin_size * 2);
 	$inner_page_height		= $page_height - ($margin_size * 2);
 	$first_column_width		= $inner_page_width * .37;
@@ -205,37 +206,37 @@ function tsmp_create_pdf_table1(){
 	require_once('tabletcpdf.php');
 	//run function to attach meeting data to $regions
 	$regions = attachPdfRegionData($regions);
-	
+
 
 	//create new PDF
 	$pdf = new TableTCPDF();
 	foreach ($regions as $region) {
 
 		if(empty($region)){
-			// if nothing in this region, skip 
+			// if nothing in this region, skip
 			continue;
 		}
 		$pdf->header = $region['name'];
 		$pdf->NewPage();
-		
+
 		if (!empty($region['sub_regions'])) {
 
 			//array_shift($region['sub_regions']);
 			foreach ($region['sub_regions'] as $sub_region => $rows) {
-				
+
 				//create a new page if there's not enough space
 				if (($inner_page_height - $pdf->GetY()) < $page_threshold) {
 					$pdf->NewPage();
 				}
-				
+
 				//draw rows
 				$pdf->drawTable($sub_region, $rows, $region['name']);
-				
+
 				//draw a gap between tables if there's space
 				if (($inner_page_height - $pdf->GetY()) > $table_gap) {
 					$pdf->Ln($table_gap);
 				}
-				
+
 				//break; //for debugging
 			}
 		} elseif ($region['rows']) {
@@ -275,7 +276,7 @@ function tsmp_create_pdf_table1(){
 	}
 	$pdf->Output( 'meeting_list.pdf', 'I');
 	exit;
-	
+
 }
 
 
@@ -305,7 +306,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	$page_width = get_option('tsmp_width');
 	$page_height = get_option('tsmp_height');
 	$html_delimiter = "</div>";
-	
+
 	//calculate column width
 	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
 	$column_height = $page_height - ($margin_size * 2);
@@ -318,7 +319,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 
 	//create new PDF
-	
+
 	$pageLayout = array($page_width, $page_height);
 	$pdf = new COLUMNPDF("", PDF_UNIT, $pageLayout, true, 'UTF-8', false);
 	$pdf->SetFont('helvetica', '', $font_size);
@@ -328,37 +329,37 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	$pdf->AddPage();
 
 	$current_column = 1;
-	//starting x,y for the start of this column 
+	//starting x,y for the start of this column
 	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 	$column_y = $margin_size;
-	
+
 	// ----------------------------------------------------------
-	//                       Pre HTML  
+	//                       Pre HTML
 	// ----------------------------------------------------------
-	
-	//loop through pre-html 
+
+	//loop through pre-html
 	if($intro_text != ""){
 		$html_array = explode($html_delimiter, $intro_text );
 		foreach ($html_array as $html_block) {
-			$html_block .= $html_delimiter; //put back what we striped out 
-			
-			//get start page to see if adding this text would send it over the edge 
+			$html_block .= $html_delimiter; //put back what we striped out
+
+			//get start page to see if adding this text would send it over the edge
 			$start_page = $pdf->getPage();
-			
-			//start a transaction, so if it goes over the edge of the page, we can rollback 
+
+			//start a transaction, so if it goes over the edge of the page, we can rollback
 			$pdf->startTransaction();
 			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 			$end_page = $pdf->getPage();
-			
+
 			if ($end_page == $start_page) {
-				//if we are still onthe same page 
+				//if we are still onthe same page
 				$pdf->commitTransaction();
-			}else{ //we would have popped to a new page 
+			}else{ //we would have popped to a new page
 				$pdf = $pdf->rollbackTransaction();
 				$current_column++;
-				
-				if($current_column > $number_of_columns){ //last column on the page 
-					//need a new page 
+
+				if($current_column > $number_of_columns){ //last column on the page
+					//need a new page
 					$pdf->AddPage();
 					$current_column = 1;
 				}
@@ -367,17 +368,17 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$pdf->SetXY($column_x,$column_y, true);
 				//write the text on the new column [and page]
 				$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
-				
+
 			}
 	}//end of Loop
 }//end of if
-		
+
 	// ----------------------------------------------------------
-	//                       meetings 
+	//                       meetings
 	// ----------------------------------------------------------
-	
+
 	$current_day = "";
-		//loop through meetings 
+		//loop through meetings
 	foreach ($mymeetings as $mymeeting){
 		$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 		$column_y = $margin_size;
@@ -390,20 +391,20 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 		}else{
 			$meeting_header = "<hr>";
 		}
-		
+
 		$start_page = $pdf->getPage();
 		//write_log("column width:" . $column_width);
 		$pdf->startTransaction();
 		$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 		$end_page = $pdf->getPage();
-		
-		
+
+
 		if ($end_page == $start_page) {
-			//if we are still onthe same page, commit 
+			//if we are still onthe same page, commit
 			$pdf->commitTransaction();
-		}else{ //we would have popped to a new page 
+		}else{ //we would have popped to a new page
 			$pdf = $pdf->rollbackTransaction();
-		
+
 			if($thisday !== $current_day){
 				//<div style="background-color:black">
 					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">" . $thisday . "</font></div>" ;
@@ -411,52 +412,52 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font color=\"white\" size=\"+2\">" . $thisday . " (cont)</font></div>" ;
 			}
 			$current_column++;
-			
-			if($current_column > $number_of_columns){ //last column on the page 
-				//need a new page 
+
+			if($current_column > $number_of_columns){ //last column on the page
+				//need a new page
 				$pdf->AddPage();
 				$current_column = 1;
 			}
-			//reset X and Y to next column 
+			//reset X and Y to next column
 			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 			$column_y = $margin_size;
 			$pdf->SetXY($column_x,$column_y, true);
 			//write the text on the new column [and page ]
 			$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
-			
+
 		}
-		
-		//set $current_day to the day for the meeting we just printed 
+
+		//set $current_day to the day for the meeting we just printed
 		$current_day = $thisday;
 
 	}
 
 	// ----------------------------------------------------------
-	//                       Post HTML  
+	//                       Post HTML
 	// ----------------------------------------------------------
 	if($outtro_text != ""){
 		$html_array = explode($html_delimiter, $outtro_text );
 		//$y = $column_y;
 		foreach ($html_array as $html_block) {
-			$html_block .= $html_delimiter; //put back what we striped out 
-			
+			$html_block .= $html_delimiter; //put back what we striped out
+
 			$start_page = $pdf->getPage();
-			
+
 			$pdf->startTransaction();
 			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 			$end_page = $pdf->getPage();
-			
-			//if we are still onthe same page 
+
+			//if we are still onthe same page
 			if ($end_page == $start_page) {
-			
+
 				$pdf->commitTransaction();
-			}else{ //we would have popped to a new page 
+			}else{ //we would have popped to a new page
 				$pdf = $pdf->rollbackTransaction();
-				
+
 				$current_column++;
-					
-				if($current_column > $number_of_columns){ //last column on the page 
-					//need a new page 
+
+				if($current_column > $number_of_columns){ //last column on the page
+					//need a new page
 					$pdf->AddPage();
 					$current_column = 1;
 				}
@@ -464,9 +465,9 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$column_y = $margin_size;
 				$pdf->SetXY($column_x,$column_y, true);
 				$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
-				
+
 			}
-		
+
 		}//end of Loop
 	}//end of if
 
@@ -476,5 +477,5 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	//$pdf->Output('meeting_list.pdf', 'I');
 	return $pdf;
 	//exit;
-	
+
 }
