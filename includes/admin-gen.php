@@ -7,6 +7,20 @@ function tsmp_gen_page() {
 
   // https://cdnjs.cloudflare.com/ajax/libs/NicEdit/0.93/nicEdit.js
   ?>
+  <head>
+<link rel="stylesheet" type="text/css" href="mystyle.css">
+<style>
+
+.small_text{
+  font-size: 75% !important;
+}
+
+.tr_with_border{
+  border: thin solid !important;
+}
+
+
+</style>
 
   <script type="text/javascript" src="<?php echo plugins_url( 'js/nicedit.js', __FILE__ ) ; ?>"></script>
 
@@ -113,7 +127,8 @@ function tsmp_gen_page() {
 
 
   </script>
-
+</head>
+<body>
   <div class="wrap">
        <h2>PDF Generation Settings</h2>
        <form id="save_settings" method="post" action="options.php">
@@ -180,10 +195,10 @@ function tsmp_gen_page() {
                     <label for="tsmp_auto_font">Automatically determine optimal Font Size</label><br>
                     <input size="2" type="text" id="tsmp_desired_page_count" name="tsmp_desired_page_count" value="<?php echo get_option('tsmp_desired_page_count'); ?>" />
                     <label for="tsmp_desired_page_count">Desired page count</label><br>
-                    <font size="-2"> This is for columns layout only. It will start with the set font size, and try to establish the optimal font size for the desired page count.<br>
+                    <p class="small_text">This is for columns layout only. It will start with the set font size, and try to establish the optimal font size for the desired page count.<br>
                       optimal font size being defined as (optimal_font_size + 0.1) would result in (desired page count +1)<br>
                       once the optimal size is determined, the size is set for future, and the PDF is generated<br>
-                      This process can take 30-60 seconds to complete</font>
+                      This process can take 30-60 seconds to complete</p>
                    </td>
                </tr>
                <tr valign="top"><th scope="row">Margin</th>
@@ -195,11 +210,24 @@ function tsmp_gen_page() {
                     checked( 1, $options['checkbox_example'], false ) /></td>
                </tr>
 
-               <tr id="custom_meeting_html_tr" class="column_row"  valign="top">
-                 <th scope="row">Meeting HTML<br><br>
+               <tr  id="custom_meeting_html_tr" class="column_row tr_with_border"  valign="top">
+                 <td scope="row"><b>Meeting HTML</b><br><br>
                    <button type=button onclick="toggleArea1('tsmp_custom_meeting_html');">Toggle  Editor</button><br><br>
                    <button type=button id="tsmp_custom_meeting_html_load" onclick="loaddata('tsmp_custom_meeting_html','tsmp_custom_meeting_html')" >Load Sample Data</button>
-                 </th>
+                   <p class="small_text">Generator will replace the following variables with actual values<br>
+                   __types__<br>
+                   __time__<br>
+                   __day_of_week__<br>
+                   __title__<br>
+                   __street_address__<br>
+                   __city__<br>
+                   __state__<br>
+                   __location__<br>
+                   __notes__<br>
+                   __location_notes__
+                   <p>
+
+                 </td>
                  <td>
                    <textarea rows="10" cols="70" id="tsmp_custom_meeting_html" name="tsmp_custom_meeting_html" ><?php echo get_option('tsmp_custom_meeting_html'); ?></textarea>
                  </td>
@@ -214,11 +242,11 @@ function tsmp_gen_page() {
                </tr>
                <tr class="column_row" ><td colspan="2"><font -2>note on html, each div rendered seperately<br>and column breaks will only fall on close of div</font>
                </td></tr>
-               <tr class="column_row"  valign="top"><th scope="row">HTML before meetings<br>
+               <tr  class="column_row tr_with_border"  valign="top"><th scope="row">HTML before meetings<br>
                <button type=button onclick="toggleArea1('tsmp_intro_html');">Toggle  Editor</button></th>
                    <td><textarea rows="10" cols="70" id="tsmp_intro_html" name="tsmp_intro_html" ><?php echo get_option('tsmp_intro_html'); ?></textarea></td>
                </tr>
-               <tr class="column_row"  valign="top"><th scope="row">HTML after meetings<br><br>
+               <tr class="column_row tr_with_border"  valign="top"><th scope="row">HTML after meetings<br><br>
                <button type=button onclick="toggleArea1('tsmp_outtro_html');">Toggle  Editor</button><br><br>
                <button type=button id="tsmp_outtro_html_load" onclick="loaddata('tsmp_outtro_html','tsmp_outtro_html')" >Load Sample Data</button>
              </th>
@@ -296,7 +324,7 @@ setEntryListeners(document.getElementById("tsmp_desired_page_count"));
 updateVarView()
 </script>
 
-
+</body>
 
   <?php
 
