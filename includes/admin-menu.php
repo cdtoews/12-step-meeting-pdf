@@ -32,7 +32,7 @@ function tsmp_options_init(){
                                       'default' => 9,
                                       )
                       );
-                      
+
     register_setting( 'tsmp-settings-group', 'tsmp_column_count', array(
                                       'type' => 'integer',
                                       'default' => 4,
@@ -76,6 +76,16 @@ function tsmp_options_init(){
       register_setting( 'tsmp-settings-group', 'tsmp_auto_font', array(
                                         'type' => 'integer',
                                         'default' => 0,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_set_custom_meeting_html', array(
+                                        'type' => 'integer',
+                                        'default' => 0,
+                                        )
+                        );
+      register_setting( 'tsmp-settings-group', 'tsmp_custom_meeting_html', array(
+                                        'type' => 'string',
+                                        'default' => '',
                                         )
                         );
       register_setting( 'tsmp-settings-group', 'tsmp_desired_page_count', array(

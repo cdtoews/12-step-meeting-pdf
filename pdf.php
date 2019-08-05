@@ -110,8 +110,7 @@
 	}
 
 
-
-
+	write_log('layout type: ' . $page_layout);
 
 	if($page_layout == "table1"){
 		tsmp_create_pdf_table1();

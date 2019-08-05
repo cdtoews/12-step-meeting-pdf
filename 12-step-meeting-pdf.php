@@ -23,10 +23,10 @@
 
  if ( ! function_exists('write_log')) {
     function write_log ( $log )  {
-       $tsmp_debug = false;
-       if(!$tsmp_debug){
-         return;
-       }
+       // $tsmp_debug = false;
+       // if(!$tsmp_debug){
+       //   return;
+       // }
        if ( is_array( $log ) || is_object( $log ) ) {
           error_log( print_r( $log, true ) );
        } else {

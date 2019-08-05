@@ -2,15 +2,16 @@
 
 function tsmp_gen_page() {
   require_once('sample_post.php');
+  require_once('sample_meeting.php');
 // settings page
 
   // https://cdnjs.cloudflare.com/ajax/libs/NicEdit/0.93/nicEdit.js
   ?>
 
-  <script type="text/javascript" src="<?php echo plugins_url( 'js/nicedit.js', __FILE__ ) ; ?>"></script> 
-   	
+  <script type="text/javascript" src="<?php echo plugins_url( 'js/nicedit.js', __FILE__ ) ; ?>"></script>
+
   <script>
-  
+
   //setup listeners for validation of all fields
   function setEntryListeners(input) {
     ["input", "select", "contextmenu", "drop"].forEach(function(event) {
@@ -24,27 +25,28 @@ function tsmp_gen_page() {
     document.getElementById("submit").disabled = true;
     document.getElementById("generate_warning").innerHTML = "You Need to click on \"Save Changes\" (Step 1 above) before generating PDF";
   }
-  
+
   function setValues(width, height) {
     document.getElementById("tsmp_width").value = width;
     document.getElementById("tsmp_height").value = height;
     disableGenerate();
   }
 
-
+  //gather sample strings
   var samples = {
     "tsmp_outtro_html": <?php echo json_encode($sample_post); ?>,
-    
+    "tsmp_custom_meeting_html": <?php echo json_encode($sample_meeting); ?>,
   };
-  
+
+//load sample strings when called
   function loaddata(filename,textid){
     var textbox = document.getElementById(textid);
     textbox.value = samples[filename];
-    
+
   }
 
   var areas = {  };
-  
+
 //tsmp_outtro_html_load
   function toggleArea1(id) {
         area1 = areas[id];
@@ -71,30 +73,42 @@ function tsmp_gen_page() {
     //read id tsmp_layout
     var x = document.getElementById("tsmp_layout").selectedIndex;
     var dropDownValue = document.getElementsByTagName("option")[x].value;
-    
+
     var divsToHide;
     var divsToShow;
     if (dropDownValue.startsWith("column")){
-      divsToHide = document.getElementsByClassName("table_row"); 
-      divsToShow = document.getElementsByClassName("column_row"); 
+      divsToHide = document.getElementsByClassName("table_row");
+      divsToShow = document.getElementsByClassName("column_row");
     } else if (dropDownValue.startsWith("table")){
-      divsToHide = document.getElementsByClassName("column_row"); 
-      divsToShow = document.getElementsByClassName("table_row"); 
+      divsToHide = document.getElementsByClassName("column_row");
+      divsToShow = document.getElementsByClassName("table_row");
     }else{
       alert("what is going on?");
     }
-    
-    
-    
+
+
+
     for(var i = 0; i < divsToHide.length; i++){
         divsToHide[i].style.display = "none"; // depending on what you're doing
     }
     for(var i = 0; i < divsToShow.length; i++){
         divsToShow[i].style.display = ""; // depending on what you're doing
     }
-    
-    
-    
+
+    //see if meeting customer HTML should show
+    // Get the checkbox
+    var custom_checkBox = document.getElementById("tsmp_set_custom_meeting_html");
+    // Get the output text
+    var custom_tr = document.getElementById("custom_meeting_html_tr");
+
+    // If the checkbox is checked, display the output text
+    if (custom_checkBox.checked == true){
+      custom_tr.style.display = "";
+    } else {
+      custom_tr.style.display = "none";
+    }
+
+
   }
 
 
@@ -114,17 +128,17 @@ function tsmp_gen_page() {
                 </th>
                  <td>
                    <select onchange="updateVarView()" id="tsmp_layout" name="tsmp_layout" value="<?php echo get_option('tsmp_layout'); ?>" />
-                      <?php 
+                      <?php
                             $tsmp_layout = get_option('tsmp_layout');
-                            $layouts = array("columns1", "table1");//for now we will leave out 'columns2'
+                            $layouts = array("columns1","columns2", "table1");//for now we will leave out 'columns2'
                             foreach ($layouts as $layout) {
                               echo ' <option value="' . $layout   .  '" ' . ($tsmp_layout == $layout ? 'selected' : '') .  '>' . $layout . '</option>';
                             }
                        ?>
                    </select>&nbsp;&nbsp;&nbsp;&nbsp;
-                   <?php  
-                     echo '<a target="_blank" href="' . plugins_url( '/column1_sample.pdf', __FILE__ ) . '" >Column1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
-                     echo '<a target="_blank" href="' . plugins_url( '/table1_sample.pdf', __FILE__ ) . '" >Table1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; '; 
+                   <?php
+                     echo '<a target="_blank" href="' . plugins_url( '/column1_sample.pdf', __FILE__ ) . '" >Column1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; ';
+                     echo '<a target="_blank" href="' . plugins_url( '/table1_sample.pdf', __FILE__ ) . '" >Table1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; ';
                    ?>
                  </td>
              </tr>
@@ -150,14 +164,14 @@ function tsmp_gen_page() {
                  <td><input type="text" id="tsmp_height" name="tsmp_height" value="<?php echo get_option('tsmp_Height'); ?>" /></td>
              </tr>
 
-              
+
                <tr valign="top"><th scope="row">Font Size<font size="-2">(decimals allowed)</font></th>
                    <td><input type="text" id="tsmp_font_size" name="tsmp_font_size" value="<?php echo get_option('tsmp_font_size'); ?>" /></td>
                </tr>
                <tr valign="top"><th scope="row">Header Font Size<font size="-2">(decimals allowed)</font></th>
                    <td><input type="text" id="tsmp_header_font_size" name="tsmp_header_font_size" value="<?php echo get_option('tsmp_header_font_size'); ?>" /></td>
                </tr>
-               
+
                <tr class="column_row"  valign="top"><th scope="row"></th>
                    <td bgcolor="#FFFFFF">
                      EXPERIMENTAL:<br>
@@ -172,10 +186,26 @@ function tsmp_gen_page() {
                       This process can take 30-60 seconds to complete</font>
                    </td>
                </tr>
-               
                <tr valign="top"><th scope="row">Margin</th>
                    <td><input type="text" id="tsmp_margin" name="tsmp_margin" value="<?php echo get_option('tsmp_margin'); ?>" /></td>
                </tr>
+
+               <tr valign="top"><th scope="row">Use Custom meeting HTML</th>
+                   <td><input onchange="updateVarView()" type="checkbox" id="tsmp_set_custom_meeting_html" name="tsmp_set_custom_meeting_html" value="1" <?php echo ( (get_option('tsmp_set_custom_meeting_html') == 1) ? "checked": ""); ?>
+                    checked( 1, $options['checkbox_example'], false ) /></td>
+               </tr>
+
+               <tr id="custom_meeting_html_tr" class="column_row"  valign="top">
+                 <th scope="row">Meeting HTML<br><br>
+                   <button type=button onclick="toggleArea1('tsmp_custom_meeting_html');">Toggle  Editor</button><br><br>
+                   <button type=button id="tsmp_custom_meeting_html_load" onclick="loaddata('tsmp_custom_meeting_html','tsmp_custom_meeting_html')" >Load Sample Data</button>
+                 </th>
+                 <td>
+                   <textarea rows="10" cols="70" id="tsmp_custom_meeting_html" name="tsmp_custom_meeting_html" ><?php echo get_option('tsmp_custom_meeting_html'); ?></textarea>
+                 </td>
+               </tr>
+
+
                <tr class="column_row" align="center">
                   <td colspan="2"><h2>Column Variables</h2></td>
                </tr>
@@ -208,7 +238,7 @@ function tsmp_gen_page() {
                </tr>
                <tr class="table_row"  class="table_row"  valign="top"><th scope="row">Include Type Index?</th>
                    <td>
-                     
+
                      <input id="include_radio1" type="radio" name="tsmp_include_index" value="1" <?php echo ((get_option('tsmp_include_index') == 1) ? 'checked' : '')?>  > Yes<br>
                      <input id="include_radio2" type="radio" name="tsmp_include_index" value="0" <?php echo ((get_option('tsmp_include_index') == 0) ? 'checked' : '')?> > No</td>
                </tr>
