@@ -27,9 +27,11 @@
 		}
 	}//end of class
 
+	$custom_meeting_set = get_option('tsmp_set_custom_meeting_html');
+	$custom_meeting_html = get_option('tsmp_custom_meeting_html');
 	$page_layout = get_option('tsmp_layout');
 	$tsmp_auto_font = get_option('tsmp_auto_font');
-	if($tsmp_auto_font == 1 && $page_layout == "columns1"){
+	if($tsmp_auto_font == 1 && startsWith($page_layout, "columns")){
 		//EXPERIMENTAL
 		$optimal_size = NULL;
 		$current_size = abs(get_option('tsmp_font_size'));

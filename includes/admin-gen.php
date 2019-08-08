@@ -220,11 +220,14 @@ function tsmp_gen_page() {
                    __day_of_week__<br>
                    __title__<br>
                    __street_address__<br>
+                   __region__<br>
+                   __subregion__<br>
                    __city__<br>
                    __state__<br>
                    __location__<br>
                    __notes__<br>
-                   __location_notes__
+                   __location_notes__<br>
+                   __formatted_address__
                    <p>
 
                  </td>
@@ -321,6 +324,9 @@ setEntryListeners(document.getElementById("include_radio1"));
 setEntryListeners(document.getElementById("include_radio2"));
 setEntryListeners(document.getElementById("tsmp_auto_font"));
 setEntryListeners(document.getElementById("tsmp_desired_page_count"));
+setEntryListeners(document.getElementById("tsmp_set_custom_meeting_html"));
+setEntryListeners(document.getElementById("tsmp_custom_meeting_html"));
+
 updateVarView()
 </script>
 
