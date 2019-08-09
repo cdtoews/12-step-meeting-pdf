@@ -243,6 +243,11 @@ function tsmp_gen_page() {
                <tr class="column_row"  valign="top"><th scope="row">Header Text</th>
                    <td><input type="text" id="tsmp_header" name="tsmp_header" value="<?php echo get_option('tsmp_header'); ?>" /></td>
                </tr>
+               <tr class="column_row"  valign="top"><th scope="row">Column2 time indent</th>
+                   <td><input type="text" id="tsmp_column2_indent" name="tsmp_column2_indent" value="<?php echo get_option('tsmp_column2_indent'); ?>" /></td>
+               </tr>
+
+
                <tr class="column_row" ><td colspan="2"><font -2>note on html, each div rendered seperately<br>and column breaks will only fall on close of div</font>
                </td></tr>
                <tr  class="column_row tr_with_border"  valign="top"><th scope="row">HTML before meetings<br>

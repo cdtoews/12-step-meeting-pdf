@@ -27,12 +27,12 @@
 		}
 	}//end of class
 
-	$custom_meeting_set = get_option('tsmp_set_custom_meeting_html');
-	$custom_meeting_html = get_option('tsmp_custom_meeting_html');
+
 	$page_layout = get_option('tsmp_layout');
 	$tsmp_auto_font = get_option('tsmp_auto_font');
-	if($tsmp_auto_font == 1 && startsWith($page_layout, "columns")){
-		//EXPERIMENTAL
+	if($tsmp_auto_font == 1 &&
+			(substr($page_layout, 0, strlen("columns")) === "columns"  )  ){
+		//working for columns1, untested with columns2
 		$optimal_size = NULL;
 		$current_size = abs(get_option('tsmp_font_size'));
 		$over = NULL;
@@ -112,7 +112,6 @@
 	}
 
 
-	write_log('layout type: ' . $page_layout);
 
 	if($page_layout == "table1"){
 		tsmp_create_pdf_table1();
@@ -286,6 +285,7 @@ function tsmp_create_pdf_table1(){
 // ===========================================================================
 
 function tsmp_create_pdf_columns($layout_type, $arg_font_size){
+	global $column2_indent;
 	ob_start();
 	ini_set('max_execution_time', 60);
 	require_once('meeting.php');
@@ -378,60 +378,173 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	//                       meetings
 	// ----------------------------------------------------------
 
-	$current_day = "";
-		//loop through meetings
-	foreach ($mymeetings as $mymeeting){
-		$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-		$column_y = $margin_size;
-		// $meeting_header = "";
-		// -------------------------------------------------------------------------
-		$thisday = $mymeeting->get_formatted_day();
-		if($thisday !== $current_day){
-				$current_day = $thisday;
-				$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">"  . $thisday . "</font></div>" ;
-		}else{
-			$meeting_header = "<hr>";
-		}
 
-		$start_page = $pdf->getPage();
-		//write_log("column width:" . $column_width);
-		$pdf->startTransaction();
-		$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
-		$end_page = $pdf->getPage();
-
-
-		if ($end_page == $start_page) {
-			//if we are still onthe same page, commit
-			$pdf->commitTransaction();
-		}else{ //we would have popped to a new page
-			$pdf = $pdf->rollbackTransaction();
-
-			if($thisday !== $current_day){
-				//<div style="background-color:black">
-					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">" . $thisday . "</font></div>" ;
-			}else{
-				$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font color=\"white\" size=\"+2\">" . $thisday . " (cont)</font></div>" ;
-			}
-			$current_column++;
-
-			if($current_column > $number_of_columns){ //last column on the page
-				//need a new page
-				$pdf->AddPage();
-				$current_column = 1;
-			}
-			//reset X and Y to next column
+	if($layout_type == 1){
+		// ----------------------------------------------------------
+		//                      Layout 1
+		// ----------------------------------------------------------
+		$current_day = "";
+			//loop through meetings
+		foreach ($mymeetings as $mymeeting){
 			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 			$column_y = $margin_size;
-			$pdf->SetXY($column_x,$column_y, true);
-			//write the text on the new column [and page ]
-			$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
+			// $meeting_header = "";
+			// -------------------------------------------------------------------------
+			$thisday = $mymeeting->get_formatted_day();
+			if($thisday !== $current_day){
+					$current_day = $thisday;
+					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">"  . $thisday . "</font></div>" ;
+			}else{
+				$meeting_header = "<hr>";
+			}
+
+			$start_page = $pdf->getPage();
+			//write_log("column width:" . $column_width);
+			$pdf->startTransaction();
+			$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+			$end_page = $pdf->getPage();
+
+
+			if ($end_page == $start_page) {
+				//if we are still onthe same page, commit
+				$pdf->commitTransaction();
+			}else{ //we would have popped to a new page
+				$pdf = $pdf->rollbackTransaction();
+
+				if($thisday !== $current_day){
+					//<div style="background-color:black">
+						$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">" . $thisday . "</font></div>" ;
+				}else{
+					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font color=\"white\" size=\"+2\">" . $thisday . " (cont)</font></div>" ;
+				}
+				$current_column++;
+
+				if($current_column > $number_of_columns){ //last column on the page
+					//need a new page
+					$pdf->AddPage();
+					$current_column = 1;
+				}
+				//reset X and Y to next column
+				$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+				$column_y = $margin_size;
+				$pdf->SetXY($column_x,$column_y, true);
+				//write the text on the new column [and page ]
+				$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
+
+			}
+
+			//set $current_day to the day for the meeting we just printed
+			$current_day = $thisday;
+
+		}
+		// end of $layout_type == 1
+	}elseif ($layout_type == 2) {
+		// ----------------------------------------------------------
+		//                      Layout 2
+		// ----------------------------------------------------------
+		$column2_indent = get_option('tsmp_column2_indent'); //indent for Time
+		$column_header_indent = 0;
+		$y_adjustment = -3;
+		$current_day = "";
+		$current_time = "";
+		$include_time = TRUE;
+			//loop through meetings
+		foreach ($mymeetings as $mymeeting){
+			$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+			$column_y = $margin_size;
+			// $meeting_header = "";
+			// -------------------------------------------------------------------------
+			$thisday = $mymeeting->get_formatted_day();
+			$thistime = $mymeeting->meeting_array['time'];
+			write_log($thistime);
+			if($thisday !== $current_day){
+					$current_day = $thisday;
+					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">"  . $thisday . "</font></div>" ;
+					$column_header_indent = 0;
+					$current_time = "";
+			}else{
+				$meeting_header = "<hr>";
+				$column_header_indent = $column2_indent;
+			}
+
+			if($thistime !== $current_time){
+				$column_header_indent = 0; //make the HR be longer
+				$include_time = TRUE;
+			}else{
+				$include_time = false;
+			}
+
+
+			$start_page = $pdf->getPage();
+			//write_log("column width:" . $column_width);
+			$pdf->startTransaction();
+			//#MultiCell(w, h, txt, border = 0, align = 'J', fill = 0, ln = 1, x = '', y = '', reseth = true, stretch = 0, ishtml = false, autopadding = true, maxh = 0)
+			//$column2_indent
+			$pdf->MultiCell($column_width - $column_header_indent, 1, $meeting_header  , 0, 'J', 0, 2, $column_x + $column_header_indent, '', true , 0, true, true, 0, 'T', true);
+
+			if($include_time){
+				//need to get xy to use after writing time
+				$currentX = $pdf->getX();
+				$currenty = $pdf->getY();
+				$pdf->MultiCell($column2_indent , 1,   $mymeeting->meeting_array['time_formatted']  , 0, 'J', 0, 2, $column_x ,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+				$pdf->SetXY($currentX,$currenty);
+			}
+
+			$pdf->MultiCell($column_width - $column2_indent , 1,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+			$end_page = $pdf->getPage();
+
+
+			if ($end_page == $start_page) {
+				//if we are still onthe same page, commit
+				$pdf->commitTransaction();
+			}else{ //we would have popped to a new page
+				$pdf = $pdf->rollbackTransaction();
+
+				if($thisday !== $current_day){
+					//<div style="background-color:black">
+						$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">" . $thisday . "</font></div>" ;
+				}else{
+					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font color=\"white\" size=\"+2\">" . $thisday . " (cont)</font></div>" ;
+				}
+
+				$current_column++;
+
+				if($current_column > $number_of_columns){ //last column on the page
+					//need a new page
+					$pdf->AddPage();
+					$current_column = 1;
+				}
+				//reset X and Y to next column
+				$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+				$column_y = $margin_size;
+				$pdf->SetXY($column_x,$column_y, true);
+				//write the text on the new column [and page ]
+				$pdf->MultiCell($column_width, 1, $meeting_header  , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+				//on a new column, we are always going to write the time, so no need for the if
+				$currentX = $pdf->getX();
+				$currenty = $pdf->getY();
+				$pdf->MultiCell($column2_indent , 1,   $mymeeting->meeting_array['time_formatted']  , 0, 'J', 0, 2, $column_x ,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+				$pdf->SetXY($currentX,$currenty);
+				
+				$pdf->MultiCell($column_width - $column2_indent , 1,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent, $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+
+			}
+
+			//set $current_day to the day for the meeting we just printed
+			$current_day = $thisday;
+			$current_time = $thistime;
 
 		}
 
-		//set $current_day to the day for the meeting we just printed
-		$current_day = $thisday;
 
+
+		//end of $layout_type == 2
+	}else{
+		//shouldn't get here
+		echo "While writing meetins, didn't have a layout_type, odd isn't it?";
+		exit;
 	}
+
 
 	// ----------------------------------------------------------
 	//                       Post HTML

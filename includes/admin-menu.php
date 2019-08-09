@@ -93,6 +93,14 @@ function tsmp_options_init(){
                                         'default' => 2,
                                         )
                         );
+      register_setting( 'tsmp-settings-group', 'tsmp_column2_indent', array(
+                                        'type' => 'integer',
+                                        'default' => 15,
+                                        )
+                        );
+
+
+
       }
 
 function tsmp_admin_menu() {
