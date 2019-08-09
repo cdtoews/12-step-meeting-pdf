@@ -39,10 +39,11 @@
 		$under = NULL;
 		$desired_page_count = get_option('tsmp_desired_page_count');
 		$loop_counter = 0;
+		$layout_type = substr($page_layout, -1);
 		do{
 
 			//first let's get a pdf and see what size it is
-			$pdf = tsmp_create_pdf_columns(1, $current_size); //when we add columns2, we'll need to take that into consideration
+			$pdf = tsmp_create_pdf_columns($layout_type, $current_size); //when we add columns2, we'll need to take that into consideration
 			$number_of_pages = $pdf->getPage();
 
 
@@ -525,7 +526,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$currenty = $pdf->getY();
 				$pdf->MultiCell($column2_indent , 1,   $mymeeting->meeting_array['time_formatted']  , 0, 'J', 0, 2, $column_x ,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
 				$pdf->SetXY($currentX,$currenty);
-				
+
 				$pdf->MultiCell($column_width - $column2_indent , 1,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent, $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
 
 			}
