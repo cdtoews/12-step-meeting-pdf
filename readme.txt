@@ -78,6 +78,8 @@ What it does:
 
 = 0.1.7 =
 * formatting fix: Meeting text was adding periods at the end of blank notes and location notes
+* Adding ability for custom meeting html
+* added column2 format with meeting indented, and time in the indent
 
 = 0.1.6 =
 * bug fix for editors not loading in https
@@ -106,6 +108,9 @@ What it does:
 * First Version
 
 == Upgrade Notice ==
+
+= 0.1.7 =
+Version 0.1.7 new formatting options, small formatting fixes
 
 = 0.1.6 =
 Version 0.1.5 bug fix for editors not loading

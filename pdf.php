@@ -282,7 +282,7 @@ function tsmp_create_pdf_table1(){
 
 
 // ===========================================================================
-//                      Make Columns 1
+//                      Make Columns
 // ===========================================================================
 
 function tsmp_create_pdf_columns($layout_type, $arg_font_size){

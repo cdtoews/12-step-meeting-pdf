@@ -90,6 +90,8 @@ function tsmp_gen_page() {
 
     var divsToHide;
     var divsToShow;
+    var col2divsToShow;
+    var col2divsToHide;
     if (dropDownValue.startsWith("column")){
       divsToHide = document.getElementsByClassName("table_row");
       divsToShow = document.getElementsByClassName("column_row");
@@ -100,7 +102,21 @@ function tsmp_gen_page() {
       alert("what is going on?");
     }
 
+    //hide/show column2 variable
+    if(dropDownValue.endsWith("2")){
+      col2divsToShow = document.getElementsByClassName("column2_row");
+      col2divsToHide = [];
+    }else{
+      col2divsToHide = document.getElementsByClassName("column2_row");//
+      col2divsToShow = [];
+    }
 
+    for(var i = 0; i < col2divsToHide.length; i++){
+        col2divsToHide[i].style.display = "none"; // depending on what you're doing
+    }
+    for(var i = 0; i < col2divsToShow.length; i++){
+        col2divsToShow[i].style.display = ""; // depending on what you're doing
+    }
 
     for(var i = 0; i < divsToHide.length; i++){
         divsToHide[i].style.display = "none"; // depending on what you're doing
@@ -145,7 +161,7 @@ function tsmp_gen_page() {
                    <select onchange="updateVarView()" id="tsmp_layout" name="tsmp_layout" value="<?php echo get_option('tsmp_layout'); ?>" />
                       <?php
                             $tsmp_layout = get_option('tsmp_layout');
-                            $layouts = array("columns1","columns2", "table1");//for now we will leave out 'columns2'
+                            $layouts = array("columns1","columns2", "table1");
                             foreach ($layouts as $layout) {
                               echo ' <option value="' . $layout   .  '" ' . ($tsmp_layout == $layout ? 'selected' : '') .  '>' . $layout . '</option>';
                             }
@@ -243,7 +259,7 @@ function tsmp_gen_page() {
                <tr class="column_row"  valign="top"><th scope="row">Header Text</th>
                    <td><input type="text" id="tsmp_header" name="tsmp_header" value="<?php echo get_option('tsmp_header'); ?>" /></td>
                </tr>
-               <tr class="column_row"  valign="top"><th scope="row">Column2 time indent</th>
+               <tr class="column2_row"  valign="top"><th scope="row">Column2 time indent</th>
                    <td><input type="text" id="tsmp_column2_indent" name="tsmp_column2_indent" value="<?php echo get_option('tsmp_column2_indent'); ?>" /></td>
                </tr>
 
