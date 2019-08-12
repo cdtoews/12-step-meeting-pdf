@@ -115,18 +115,30 @@
 
 
 	if($page_layout == "table1"){
-		tsmp_create_pdf_table1();
+		$pdf = tsmp_create_pdf_table1();
 	}elseif($page_layout == "columns1"){
 		$pdf = tsmp_create_pdf_columns(1, NULL);
-		$pdf->Output('meeting_list.pdf', 'I');
-		exit;
+		//$pdf->Output('meeting_list.pdf', 'I');
+		//exit;
 	}elseif($page_layout == "columns2"){
 		$pdf = tsmp_create_pdf_columns(2, NULL);
-		$pdf->Output('meeting_list.pdf', 'I');
-		exit;
+		//$pdf->Output('meeting_list.pdf', 'I');
+		//exit;
 	}else{
 		echo 'something is wrong, page_layout not specified correctly';
+		exit;
 	}
+
+	//let's see if we should make a local copy of file
+	$set_save_file = get_option('tsmp_set_save_file');
+
+	if($set_save_file == 1){
+		$save_file_name = get_home_path() . get_option('tsmp_save_file_name');
+		$pdf->Output($save_file_name, 'F');
+	}
+
+	//then display it either way 
+	$pdf->Output('meeting_list.pdf', 'I');
 
 });
 
@@ -275,9 +287,9 @@ function tsmp_create_pdf_table1(){
 		$pdf->Cell($index_width * .35, 0, $zip, array('B'=>array('width' => .1)), 0);
 		$pdf->Cell($index_width * .65, 0, implode(', ', $pages), array('B'=>array('width' => .1)), 1, 'R');
 	}
-	$pdf->Output( 'meeting_list.pdf', 'I');
-	exit;
-
+	// $pdf->Output( 'meeting_list.pdf', 'I');
+	// exit;
+	return $pdf;
 }
 
 
@@ -457,7 +469,6 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			// -------------------------------------------------------------------------
 			$thisday = $mymeeting->get_formatted_day();
 			$thistime = $mymeeting->meeting_array['time'];
-			write_log($thistime);
 			if($thisday !== $current_day){
 					$current_day = $thisday;
 					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">"  . $thisday . "</font></div>" ;

@@ -98,8 +98,16 @@ function tsmp_options_init(){
                                         'default' => 15,
                                         )
                         );
-
-
+        register_setting( 'tsmp-settings-group', 'tsmp_set_save_file', array(
+                                          'type' => 'integer',
+                                          'default' => 0,
+                                          )
+                          );
+        register_setting( 'tsmp-settings-group', 'tsmp_save_file_name', array(
+                                          'type' => 'string',
+                                          'default' => 'wp-content/uploads/meeting_list.pdf',
+                                          )
+                          );
 
       }
 

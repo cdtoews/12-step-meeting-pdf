@@ -138,6 +138,15 @@ function tsmp_gen_page() {
       custom_tr.style.display = "none";
     }
 
+    //let's check the filename checkbox thingie
+    var saveCheckbox = document.getElementById("tsmp_set_save_file");
+    if (saveCheckbox.checked == true){
+      document.getElementById("tr_tsmp_save_file_name").style.display = "";
+    } else {
+      document.getElementById("tr_tsmp_save_file_name").style.display = "none";
+    }
+
+
 
   }
 
@@ -169,6 +178,7 @@ function tsmp_gen_page() {
                    </select>&nbsp;&nbsp;&nbsp;&nbsp;
                    <?php
                      echo '<a target="_blank" href="' . plugins_url( '/column1_sample.pdf', __FILE__ ) . '" >Column1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; ';
+                     echo '<a target="_blank" href="' . plugins_url( '/column2_sample.pdf', __FILE__ ) . '" >Column2 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; ';
                      echo '<a target="_blank" href="' . plugins_url( '/table1_sample.pdf', __FILE__ ) . '" >Table1 Sample</a>&nbsp;&nbsp;&nbsp;&nbsp; ';
                    ?>
                  </td>
@@ -295,11 +305,19 @@ function tsmp_gen_page() {
                      <input id="include_radio2" type="radio" name="tsmp_include_index" value="0" <?php echo ((get_option('tsmp_include_index') == 0) ? 'checked' : '')?> > No</td>
                </tr>
 
+               <tr valign="top"><th scope="row">Save a copy of File</th>
+                   <td><input onchange="updateVarView()" type="checkbox" id="tsmp_set_save_file" name="tsmp_set_save_file" value="1" <?php echo ( (get_option('tsmp_set_save_file') == 1) ? "checked": ""); ?>
+                    checked( 1, $options['checkbox_example'], false ) /></td>
+               </tr>
+               <tr class="column_row" id="tr_tsmp_save_file_name"  valign="top"><th scope="row">File Name</th>
+                   <td><?php echo get_home_path();  ?>    <input size=100 type="text" id="tsmp_save_file_name" name="tsmp_save_file_name" value="<?php echo get_option('tsmp_save_file_name'); ?>" /></td>
+               </tr>
 
            </table>
 
 <?php
 
+//for debugging:
 if(1==2){
   echo "tsmp_column_padding :" .  get_option('tsmp_column_padding') . "<br>";
   echo "tsmp_column_count :" .  get_option('tsmp_column_count') . "<br>";
@@ -347,6 +365,10 @@ setEntryListeners(document.getElementById("tsmp_auto_font"));
 setEntryListeners(document.getElementById("tsmp_desired_page_count"));
 setEntryListeners(document.getElementById("tsmp_set_custom_meeting_html"));
 setEntryListeners(document.getElementById("tsmp_custom_meeting_html"));
+setEntryListeners(document.getElementById("tsmp_save_file_name"));
+setEntryListeners(document.getElementById("tsmp_set_save_file"));
+
+
 
 updateVarView()
 </script>

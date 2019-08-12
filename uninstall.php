@@ -21,3 +21,5 @@ unregister_setting( 'tsmp-settings-group', 'tsmp_desired_page_count');
 unregister_setting( 'tsmp-settings-group', 'tsmp_set_custom_meeting_html');
 unregister_setting( 'tsmp-settings-group', 'tsmp_custom_meeting_html');
 unregister_setting( 'tsmp-settings-group', 'tsmp_column2_indent');
+unregister_setting( 'tsmp-settings-group', 'tsmp_set_save_file');
+unregister_setting( 'tsmp-settings-group', 'tsmp_save_file_name');
