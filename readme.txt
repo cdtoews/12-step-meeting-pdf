@@ -4,7 +4,7 @@ Donate link: https://paypal.me/cdtoews
 Tags: 12 step,12 step meeting, 12 step meetings, meeting list, 12 step meeting list
 Requires at least: 4.7
 Tested up to: 5.2
-Stable tag: 0.1.7
+Stable tag: 0.1.8
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -84,6 +84,10 @@ What it does:
 
 == Changelog ==
 
+= 0.1.8 =
+* by Request of AA of Ft. Worth AA:
+* Added switch to disable new page for every region on Table1 format
+
 = 0.1.7 =
 * formatting fix: Meeting text was adding periods at the end of blank notes and location notes
 * by Request of AA of Greensboro, NC:
@@ -118,6 +122,10 @@ What it does:
 * First Version
 
 == Upgrade Notice ==
+
+= 0.1.7 =
+by Request of AA of Ft. Worth AA:
+Added switch to disable new page for every region on Table1 format
 
 = 0.1.7 =
 Version 0.1.7 small formatting fixes, minor bug fixes
