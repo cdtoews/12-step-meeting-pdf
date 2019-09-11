@@ -108,6 +108,13 @@ function tsmp_options_init(){
                                           'default' => 'wp-content/uploads/meeting_list.pdf',
                                           )
                           );
+        register_setting( 'tsmp-settings-group', 'tsmp_table_region_new_page', array(
+                                          'type' => 'integer',
+                                          'default' => 1,
+                                          )
+                          );
+
+
 
       }
 

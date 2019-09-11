@@ -298,12 +298,20 @@ function tsmp_gen_page() {
                <tr class="table_row"  valign="top"><th scope="row">Starting Page Number</th>
                    <td><input type="text" id="tsmp_first_page_no" name="tsmp_first_page_no" value="<?php echo get_option('tsmp_first_page_no'); ?>" /></td>
                </tr>
-               <tr class="table_row"  class="table_row"  valign="top"><th scope="row">Include Type Index?</th>
+               <tr  class="table_row"  valign="top"><th scope="row">Include Type Index?</th>
                    <td>
 
                      <input id="include_radio1" type="radio" name="tsmp_include_index" value="1" <?php echo ((get_option('tsmp_include_index') == 1) ? 'checked' : '')?>  > Yes<br>
                      <input id="include_radio2" type="radio" name="tsmp_include_index" value="0" <?php echo ((get_option('tsmp_include_index') == 0) ? 'checked' : '')?> > No</td>
                </tr>
+               <tr class="table_row" valign="top"><th scope="row">New Page for each region</th>
+                   <td><input onchange="updateVarView()" type="checkbox" id="tsmp_table_region_new_page" name="tsmp_table_region_new_page" value="1" <?php echo ( (get_option('tsmp_table_region_new_page') == 1) ? "checked": ""); ?>
+                    checked( 1, $options['checkbox_example'], false ) /></td>
+               </tr>
+
+
+
+
 
                <tr valign="top"><th scope="row">Save a copy of File</th>
                    <td><input onchange="updateVarView()" type="checkbox" id="tsmp_set_save_file" name="tsmp_set_save_file" value="1" <?php echo ( (get_option('tsmp_set_save_file') == 1) ? "checked": ""); ?>
@@ -326,6 +334,62 @@ if(1==2){
   echo "tsmp_header :" .  get_option('tsmp_header') . "<br>";
   echo "tsmp_intro_html :" .  get_option('tsmp_intro_html') . "<br>";
   echo "tsmp_outtro_html :" .  get_option('tsmp_outtro_html') . "<br>";
+
+
+echo "post types: <br>";
+  foreach ( get_post_types( '', 'names' ) as $post_type ) {
+     echo '<p>' . $post_type . '</p>';
+  }
+
+
+echo "<hr>";
+echo "public custom post types <br>";
+$args = array(
+   'public'   => true,
+   '_builtin' => false
+);
+
+$output = 'names'; // names or objects, note names is the default
+$operator = 'and'; // 'and' or 'or'
+
+$post_types = get_post_types( $args, $output, $operator );
+
+foreach ( $post_types  as $post_type ) {
+
+   echo '<p>' . $post_type . '</p>';
+}
+
+
+
+echo "<hr>";
+
+echo "getting taxonomy for _____ <br>";
+$regions = get_terms('tsml_region');
+  // $results = array();
+  foreach ($regions as $region) {
+    echo $region->slug . " ----  " . $region->name . "<br>";
+    // $results[] = array(
+    //   'id'				=> $region->slug,
+    //   'value'				=> html_entity_decode($region->name),
+    //   'type'				=> 'region',
+    //   'tokens'			=> tsml_string_tokens($region->name),
+    // );
+  }
+
+echo "<hr>";
+echo "custom taxonomies <br>";
+
+$terms = get_terms([
+
+    'hide_empty' => false,
+]);
+
+foreach ($terms as $term){
+  var_dump($term);
+  echo  "<br>";
+}
+
+
 }
 ?>
 
@@ -367,7 +431,7 @@ setEntryListeners(document.getElementById("tsmp_set_custom_meeting_html"));
 setEntryListeners(document.getElementById("tsmp_custom_meeting_html"));
 setEntryListeners(document.getElementById("tsmp_save_file_name"));
 setEntryListeners(document.getElementById("tsmp_set_save_file"));
-
+setEntryListeners(document.getElementById("tsmp_table_region_new_page"));
 
 
 updateVarView()

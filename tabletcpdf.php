@@ -10,7 +10,7 @@ class TableTCPDF extends TCPDF {
 
 	function __construct() {
 		global $margins, $font_table_rows, $page_width, $page_height, $table_padding;
-		
+
 		$margin_size = get_option('tsmp_margin');
 		$font_size = get_option('tsmp_font_size');
 		$number_of_columns = get_option('tsmp_column_count');
@@ -19,17 +19,17 @@ class TableTCPDF extends TCPDF {
 		$intro_text = get_option('tsmp_intro_html');
 		$page_width = get_option('tsmp_width');
 		$page_height = get_option('tsmp_height');
-		
+
 		parent::__construct('', 'mm', array($page_width, $page_height));
 		$this->SetTitle('Meeting List');
 		$this->SetMargins($margin_size, $margin_size, $margin_size);
 		$this->SetAutoPageBreak(true, $margin_size);
-		
+
 		$this->blank = clone $this;
 		$this->blank->SetFont($font_table_rows[0], $font_table_rows[1], $font_table_rows[2]);
 		$this->blank->SetCellPaddings($table_padding, $table_padding, $table_padding, $table_padding);
 	}
-	
+
 	public function NewPage() {
 		$this->AddPage();
 		$this->count_rows = 0;
@@ -44,7 +44,7 @@ class TableTCPDF extends TCPDF {
 			$this->SetFont($font_header[0], $font_header[1], $font_header[2]);
 			$this->SetCellPaddings(0, 0, 0, 0);
 			$align = ($page % 2) ? 'L' : 'R';
-			$this->Cell(0, 6, $this->header, 0, 1, $align, 0);	
+			$this->Cell(0, 6, $this->header, 0, 1, $align, 0);
     }
 
     public function Footer() {
@@ -57,7 +57,7 @@ class TableTCPDF extends TCPDF {
 		//Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link='', $stretch=0, $ignore_min_height=false, $calign='T', $valign='M') {
 		$this->Cell(0, 0, $page, 0, false, $align);
 	}
-	
+
 	private function guessFirstCellHeight($html) {
 		global $first_column_width, $table_border_width, $font_table_rows, $table_padding;
 		$this->blank->AddPage();
@@ -96,12 +96,12 @@ class TableTCPDF extends TCPDF {
 	public function drawTable($title, $rows, $region) {
 		global $first_column_width, $day_column_width, $table_border_width, $inner_page_height,
 			$font_table_rows, $index, $exclude_from_indexes, $zip_codes, $table_padding, $line_height_ratio;
-		
+
 		$this->drawTableHeader($title);
 
 		//draw table rows
 		foreach ($rows as $row) {
-						
+
 			//build first column
 			$group_title = strtoupper($row['group']);
 			if ($row['spanish']) $group_title .= ' SP';
@@ -113,7 +113,7 @@ class TableTCPDF extends TCPDF {
 			if (count($row['footnotes'])) {
 				$footnotes = '';
 				foreach ($row['footnotes'] as $footnote => $symbol) {
-					$footnotes .= $symbol . $footnote . ' '; 
+					$footnotes .= $symbol . $footnote . ' ';
 				}
 				$left_column[] = trim($footnotes);
 			}
@@ -125,7 +125,7 @@ class TableTCPDF extends TCPDF {
 					<td width="20%" align="right">' . $row['last_contact'] . '</td>
 				</tr>
 			</table>' . implode('<br>', $left_column);
-			
+
 			$line_count = max(
 				$this->getNumLines(implode("\n", $row['days'][0]), $day_column_width),
 				$this->getNumLines(implode("\n", $row['days'][1]), $day_column_width),
@@ -135,40 +135,40 @@ class TableTCPDF extends TCPDF {
 				$this->getNumLines(implode("\n", $row['days'][5]), $day_column_width),
 				$this->getNumLines(implode("\n", $row['days'][6]), $day_column_width)
 			);
-			
+
 			$row_height = max(
 				($line_count * $line_height_ratio) + ($table_padding * 2),
 				$this->guessFirstCellHeight($html)
 			);
-			
-			//why on earth is $row_height not necessary here?
-			if (($this->GetY() + 10) > $inner_page_height) {
+
+			//using $row_height to see if we need a new row
+			if (($this->GetY() + $row_height) > $inner_page_height) {
 				$this->NewPage();
 				$this->drawTableHeader($title);
 			}
-							
+
 			$this->MultiCell($first_column_width, $row_height, $html, array('LTRB'=>array('width' => $table_border_width)), 'L', false, 0, '', '', true, 0, true);
 			foreach ($row['days'] as $day) {
 				$this->MultiCell($day_column_width, $row_height, implode("\n", $day), array('LTRB'=>array('width' => $table_border_width)), 'C', false, 0);
 			}
 			$this->Ln();
-			
+
 			$page = $this->getPage() + get_option('tsmp_first_page_no') - 1;
-			
+
 			//update index
 			$row['types'] = array_unique($row['types']);
 			$row['types'] = array_map('decode_types', $row['types']);
 			$row['types'] = array_diff($row['types'], $exclude_from_indexes);
-			
+
 			//if include index tsmp_include_index
 			if (get_option('tsmp_include_index') == 1) {
 				foreach ($row['types'] as $type) {
 					$index[$type][$row['group']] = $page;
 				}
 			}
-			
+
 			$index[$region][$row['group']] = $page;
-			
+
 			if (!empty($row['postal_code'])) {
 				if (!array_key_exists($row['postal_code'], $zip_codes)) {
 					$zip_codes[$row['postal_code']] = array();

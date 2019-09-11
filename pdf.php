@@ -137,7 +137,7 @@
 		$pdf->Output($save_file_name, 'F');
 	}
 
-	//then display it either way 
+	//then display it either way
 	$pdf->Output('meeting_list.pdf', 'I');
 
 });
@@ -162,6 +162,7 @@ function tsmp_create_pdf_table1(){
 		die('you do not have access to view this page');
 	}
 
+
 	ini_set('max_execution_time', 60);
 	//output PDF of NYC meeting list using the TCPDF library
 	//don't show these in indexes
@@ -176,6 +177,7 @@ function tsmp_create_pdf_table1(){
 	$intro_text = get_option('tsmp_intro_html');
 	$page_width = get_option('tsmp_width');
 	$page_height = get_option('tsmp_height');
+	$region_new_page = get_option('tsmp_table_region_new_page');
 
 
 	$first_page_no = 1;
@@ -205,7 +207,7 @@ function tsmp_create_pdf_table1(){
 	$inner_page_height		= $page_height - ($margin_size * 2);
 	$first_column_width		= $inner_page_width * .37;
 	$day_column_width		= ($inner_page_width - $first_column_width) / 7;
-	$page_threshold			= .5 * $inch_converter; //amount of space to start a new section
+	$page_threshold		= .5 * $inch_converter; //amount of space to start a new section
 	$index = $zip_codes		= array();
 	//main sections are here manually to preserve book order
 	$region_ids = tsml_get_all_regions();
@@ -223,6 +225,11 @@ function tsmp_create_pdf_table1(){
 
 	//create new PDF
 	$pdf = new TableTCPDF();
+	if ($region_new_page == 0){
+		//if we aren't having a new page each region, we need to make our first one here
+		$pdf->NewPage();
+	}
+
 	foreach ($regions as $region) {
 
 		if(empty($region)){
@@ -230,17 +237,16 @@ function tsmp_create_pdf_table1(){
 			continue;
 		}
 		$pdf->header = $region['name'];
-		$pdf->NewPage();
+
+		if ($region_new_page == 1){
+			//new page each region
+			$pdf->NewPage();
+		}
 
 		if (!empty($region['sub_regions'])) {
 
 			//array_shift($region['sub_regions']);
 			foreach ($region['sub_regions'] as $sub_region => $rows) {
-
-				//create a new page if there's not enough space
-				if (($inner_page_height - $pdf->GetY()) < $page_threshold) {
-					$pdf->NewPage();
-				}
 
 				//draw rows
 				$pdf->drawTable($sub_region, $rows, $region['name']);
@@ -253,7 +259,9 @@ function tsmp_create_pdf_table1(){
 				//break; //for debugging
 			}
 		} elseif ($region['rows']) {
+
 			$pdf->drawTable($region['name'], $region['rows'], $region['name']);
+
 		}
 		//break; //for debugging
 	}
