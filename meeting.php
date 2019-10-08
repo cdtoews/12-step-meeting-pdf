@@ -80,7 +80,6 @@ class meeting {
     //first let's check if we will be using custom text, shall we
     $custom_meeting_set = get_option('tsmp_set_custom_meeting_html');
 
-
     //write_log("custom_meeting_set = " . $globals[$custom_meeting_set]);
     if($custom_meeting_set == 1){
       $this_meeting_html = get_option('tsmp_custom_meeting_html');
@@ -129,10 +128,14 @@ class meeting {
 
       //let's only add notes and location notes if they exists. this was adding extra punctuation
       if(strlen(@$this->meeting_array['notes']) > 0){
-        $meetingtext .= @$this->meeting_array['notes'] . ". ";
+        $meetingtext .= @$this->meeting_array['notes'];
+        // if notes doesn't end with a period, add one. otherwise add just a space
+        $meetingtext .= (strcmp(substr( @$this->meeting_array['notes'], -1) , '.') == 0 ? ' ' : '. ');
       }
       if(strlen(@$this->meeting_array['location_notes']) > 0){
-        $meetingtext .= @$this->meeting_array['location_notes'] . ". ";
+        $meetingtext .= @$this->meeting_array['location_notes'];
+        //if location_notes doesn't end with a period, add one, otherwise just add a space
+        $meetingtext .= (strcmp(substr( @$this->meeting_array['location_notes'], -1) , '.') == 0 ? ' ' : '. ');
       }
 
 
@@ -169,9 +172,5 @@ class meeting {
     }
   }
 
-
-
-
-//implode (',' , $meeting['types'])
 
 }

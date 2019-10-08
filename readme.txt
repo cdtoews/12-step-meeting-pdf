@@ -84,6 +84,11 @@ What it does:
 
 == Changelog ==
 
+
+= 0.2.0 =
+* removed extra period if notes or location_notes ended in a period.
+
+
 = 0.1.8 =
 * by Request of AA of Ft. Worth AA:
 * Added switch to disable new page for every region on Table1 format
