@@ -211,8 +211,14 @@ function tsmp_gen_page() {
                 // print_r($tsmp_filtering_types_what);
                 // print_r($meeting_types_in_use);
 
+                if(is_array($tsmp_filtering_types_what)){
+                  $tsmp_filtering_types_displayed =  array_unique(array_merge ($tsmp_filtering_types_what, $meeting_types_in_use));
+                }else{
+                  $tsmp_filtering_types_displayed =   $meeting_types_in_use;
+                }
+
                 // $tsmp_filtering_types_displayed = sort(array_unique (array_merge ($tsmp_filtering_types_what, $meeting_types_in_use)));
-                $tsmp_filtering_types_displayed =  array_unique(array_merge ($tsmp_filtering_types_what, $meeting_types_in_use));
+              //  $tsmp_filtering_types_displayed =  array_unique(array_merge ($tsmp_filtering_types_what, $meeting_types_in_use));
                 sort($tsmp_filtering_types_displayed);
 
                ?>
@@ -242,7 +248,7 @@ function tsmp_gen_page() {
 
                        <?php
                        foreach ($tsmp_filtering_types_displayed as $each_type) {
-                         echo "<input class='type_what_boxes' type='checkbox' name='tsmp_filtering_types_what[]' value='" . $each_type . "'" . (in_array($each_type,$tsmp_filtering_types_what) ? 'checked' : '') ."  >" . $each_type . "<br>";
+                         echo "<input class='type_what_boxes' type='checkbox' name='tsmp_filtering_types_what[]' value='" . $each_type . "'" . (@in_array($each_type,$tsmp_filtering_types_what) ? 'checked' : '') ."  >" . $each_type . "<br>";
 
                         // echo ' <option value="' . $layout   .  '" ' . ($tsmp_layout == $layout ? 'selected' : '') .  '>' . $layout . '</option>';
                        }

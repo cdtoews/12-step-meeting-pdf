@@ -122,7 +122,7 @@ function tsmp_options_init(){
                           );
 
         register_setting( 'tsmp-settings-group', 'tsmp_filtering_types_what', array(
-                                          'type' => 'string',
+                                          'type' => 'array',
                                           'default' => '',
                                           )
                                           //comma seperated list of types being filterd
