@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/cdtoews/12-step-meeting-pdf
  * Description: Create PDF meeting list from the 12 Step Meeting List Plugin
  * code forked from https://github.com/meeting-guide/nyintergroup
- * Version: 0.2.0
+ * Version: 0.2.1
  * Author: Chris Toews
  * Author URI: https://yourtechguys.info
  * Text Domain: 12-step-meeting-pdf
@@ -19,7 +19,7 @@
 
  if (!defined('TSMP_CONTACT_EMAIL')) define('TSMP_CONTACT_EMAIL', 'chris@yourtechguys.info');
  if (!defined('TSMP_PATH')) define('TSMP_PATH', plugin_dir_path(__FILE__));
- if (!defined('TSMP_VERSION')) define('TSMP_VERSION', '0.1.0');
+ if (!defined('TSMP_VERSION')) define('TSMP_VERSION', '0.2.1');
 
  if ( ! function_exists('write_log')) {
     function write_log ( $log )  {
@@ -79,6 +79,11 @@
        ,false
      );
 
+     $meetings = filter_meetings($meetings);
+
+     //i'm after tsml_types_in_use
+  // $all_options = get_option('tsml_types_in_use');
+  // write_log($all_options);
 
 	$mymeetings = array();
 	foreach ($meetings as $meeting) {
@@ -92,6 +97,9 @@
       //     'time' => $meeting['time_formatted'],
       //     'types' => $meeting['types']
 	    //  );
+
+      //write all types out
+      //write_log($meeting['types']);
 
 
       $mymeeting =  new  meeting($meeting);
@@ -140,6 +148,8 @@ function attachPdfRegionData($regions) {
      array( 'post_status' => array('publish', 'private')  )
      ,false
    );
+$meetings = filter_meetings($meetings);
+
 	foreach ($meetings as $meeting) {
 
 		//we group meetings by group-at-location
@@ -293,4 +303,44 @@ function attachPdfRegionData($regions) {
 	//dd($regions);
 
 	return $regions;
+}
+
+
+function filter_meetings($meetings){
+
+  $filtered_meetings = array();
+  $tsmp_filtering_types_what = get_option('tsmp_filtering_types_what');
+  //in_array($each_type,$tsmp_filtering_types_what)
+  $tsmp_filtering_types_how = get_option('tsmp_filtering_types_how');
+  if($tsmp_filtering_types_how == 'w'){
+    //white list
+    foreach ($meetings as $meeting) {
+
+        $this_types = $meeting['types'];
+        $this_intersection=array_intersect($this_types,$tsmp_filtering_types_what );
+        if(sizeof($this_intersection) > 0){
+          array_push($filtered_meetings,$meeting );
+        }
+    }
+  }elseif($tsmp_filtering_types_how == 'b'){
+    //black list
+    foreach ($meetings as $meeting) {
+
+        $this_types = $meeting['types'];
+        $this_intersection=array_intersect($this_types,$tsmp_filtering_types_what );
+        if(sizeof($this_intersection) == 0){
+          array_push($filtered_meetings,$meeting );
+        }
+    }
+  }else{
+    //if not either, assume  no filtering
+    return $meetings;
+  }
+
+
+
+
+
+
+  return $filtered_meetings;
 }

@@ -114,6 +114,21 @@ function tsmp_options_init(){
                                           )
                           );
 
+        register_setting( 'tsmp-settings-group', 'tsmp_filtering_types_how', array(
+                                          'type' => 'string',
+                                          'default' => 'n',
+                                          )
+                                          //w=white list, b=black lisst, n = none
+                          );
+
+        register_setting( 'tsmp-settings-group', 'tsmp_filtering_types_what', array(
+                                          'type' => 'string',
+                                          'default' => '',
+                                          )
+                                          //comma seperated list of types being filterd
+                          );
+
+
 
 
       }

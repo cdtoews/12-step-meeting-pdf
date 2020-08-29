@@ -98,7 +98,10 @@ class meeting {
         array("__location__", @$this->meeting_array['location'] ),
         array("__notes__", @$this->meeting_array['notes'] ),
         array("__location_notes__", @$this->meeting_array['location_notes'] ),
-        array("__formatted_address__", @$this->meeting_array['formatted_address'])
+        array("__formatted_address__", @$this->meeting_array['formatted_address']),
+        array("__conference_url__", @$this->meeting_array['conference_url']),
+        array("__conference_phone__", @$this->meeting_array['conference_phone'])
+
         );
 
       foreach($meeting_variables as $item) {

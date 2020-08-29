@@ -34,6 +34,18 @@ function tsmp_gen_page() {
       });
     });
   }
+
+  //setup listeners for validation of all fields if array of inputs
+  function setEntryListeners_onarray(input, index) {
+    alert(input.value);
+    ["input", "select", "contextmenu", "drop"].forEach(function(event) {
+      input.addEventListener(event, function() {
+        disableGenerate();
+      });
+    });
+  }
+
+
   //generate_warning
   function disableGenerate(){
     document.getElementById("submit").disabled = true;
@@ -184,6 +196,77 @@ function tsmp_gen_page() {
                  </td>
              </tr>
 
+              <?php
+                $tsmp_filtering_types_how = get_option('tsmp_filtering_types_how');
+                $tsmp_filtering_types_what = get_option('tsmp_filtering_types_what');
+
+                //if how not properly defined, set to none
+                if($tsmp_filtering_types_how != 'w' && $tsmp_filtering_types_how != 'b' && $tsmp_filtering_types_how != 'n'){
+                  $tsmp_filtering_types_how = 'n';
+                }
+
+                //bring what to an array
+                //$tsmp_filtering_types_what_array = explode(',',$tsmp_filtering_types_what);
+                $meeting_types_in_use = get_option('tsml_types_in_use');
+                // print_r($tsmp_filtering_types_what);
+                // print_r($meeting_types_in_use);
+
+                // $tsmp_filtering_types_displayed = sort(array_unique (array_merge ($tsmp_filtering_types_what, $meeting_types_in_use)));
+                $tsmp_filtering_types_displayed =  array_unique(array_merge ($tsmp_filtering_types_what, $meeting_types_in_use));
+                sort($tsmp_filtering_types_displayed);
+
+               ?>
+
+
+             <tr valign="top"><th scope="row">Filtering by Types</th>
+               <td>
+
+
+
+                 <table>
+                   <tr>
+                     <td style="vertical-align:top">
+                       Filter how:<br>
+                       <input type="radio" id="white_list" name="tsmp_filtering_types_how" value="w" <?php echo ($tsmp_filtering_types_how == 'w' ? 'checked' : '') ?>>
+                        <label for="white_list">White List</label><br>
+                        <input type="radio" id="black_list" name="tsmp_filtering_types_how" value="b" <?php echo ($tsmp_filtering_types_how == 'b' ? 'checked' : '') ?>>
+                        <label for="black_list">Black List</label><br>
+                        <input type="radio" id="no_filtering" name="tsmp_filtering_types_how" value="n" <?php echo ($tsmp_filtering_types_how == 'n' ? 'checked' : '') ?>>
+                        <label for="no_filtering">No Filtering</label>
+                     </td>
+                     <td width='1' style="border-right: 3px solid #cdd0d4;">
+                     </td>
+                     <td style="vertical-align:top">
+                       filter what: ( <a href="https://github.com/code4recovery/12-step-meeting-list/blob/master/includes/variables.php#L501" target="_blank"> list of types</a> )
+                       <br>
+
+                       <?php
+                       foreach ($tsmp_filtering_types_displayed as $each_type) {
+                         echo "<input class='type_what_boxes' type='checkbox' name='tsmp_filtering_types_what[]' value='" . $each_type . "'" . (in_array($each_type,$tsmp_filtering_types_what) ? 'checked' : '') ."  >" . $each_type . "<br>";
+
+                        // echo ' <option value="' . $layout   .  '" ' . ($tsmp_layout == $layout ? 'selected' : '') .  '>' . $layout . '</option>';
+                       }
+
+                       ?>
+
+
+                     </td>
+
+
+                   </tr>
+
+                 </table>
+
+
+
+
+
+               </td>
+
+
+
+             </tr>
+
              <tr valign="top"><th scope="row">Paper Size</th>
                  <td>
                      <table>
@@ -253,7 +336,9 @@ function tsmp_gen_page() {
                    __location__<br>
                    __notes__<br>
                    __location_notes__<br>
-                   __formatted_address__
+                   __formatted_address__<br>
+                   __conference_url__<br>
+                   __conference_phone__
                    <p>
 
                  </td>
@@ -332,8 +417,16 @@ if(1==2){
   echo "tsmp_margin :" .  get_option('tsmp_margin') . "<br>";
   echo "tsmp_font_size :" .  get_option('tsmp_font_size') . "<br>";
   echo "tsmp_header :" .  get_option('tsmp_header') . "<br>";
+  echo "tsmp_filtering_types_how :" .  get_option('tsmp_filtering_types_how') . "<br>";
+  echo "tsmp_filtering_types_what :";
+print_r(get_option('tsmp_filtering_types_what') );
+  echo "<br>";
+
   echo "tsmp_intro_html :" .  get_option('tsmp_intro_html') . "<br>";
   echo "tsmp_outtro_html :" .  get_option('tsmp_outtro_html') . "<br>";
+
+
+
 
 
 echo "post types: <br>";
@@ -432,6 +525,19 @@ setEntryListeners(document.getElementById("tsmp_custom_meeting_html"));
 setEntryListeners(document.getElementById("tsmp_save_file_name"));
 setEntryListeners(document.getElementById("tsmp_set_save_file"));
 setEntryListeners(document.getElementById("tsmp_table_region_new_page"));
+
+setEntryListeners(document.getElementById("no_filtering"));
+setEntryListeners(document.getElementById("white_list"));
+setEntryListeners(document.getElementById("black_list"));
+
+
+
+var typeboxes = document.getElementsByClassName("type_what_boxes");
+for(var i = 0; i < typeboxes.length; i++)
+{
+   setEntryListeners(typeboxes[i]);
+}
+
 
 
 updateVarView()

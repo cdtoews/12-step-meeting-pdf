@@ -24,3 +24,5 @@ unregister_setting( 'tsmp-settings-group', 'tsmp_column2_indent');
 unregister_setting( 'tsmp-settings-group', 'tsmp_set_save_file');
 unregister_setting( 'tsmp-settings-group', 'tsmp_save_file_name');
 unregister_setting( 'tsmp-settings-group', 'tsmp_table_region_new_page');
+unregister_setting( 'tsmp-settings-group', 'tsmp_filtering_types_what');
+unregister_setting( 'tsmp-settings-group', 'tsmp_filtering_types_how');
