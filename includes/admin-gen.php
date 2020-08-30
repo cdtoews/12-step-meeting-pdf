@@ -157,12 +157,7 @@ function tsmp_gen_page() {
     } else {
       document.getElementById("tr_tsmp_save_file_name").style.display = "none";
     }
-
-
-
   }
-
-
   </script>
 </head>
 <body>
@@ -205,11 +200,12 @@ function tsmp_gen_page() {
                   $tsmp_filtering_types_how = 'n';
                 }
 
-                //bring what to an array
-                //$tsmp_filtering_types_what_array = explode(',',$tsmp_filtering_types_what);
                 $meeting_types_in_use = get_option('tsml_types_in_use');
-                // print_r($tsmp_filtering_types_what);
-                // print_r($meeting_types_in_use);
+
+                //pull eeting types from other plugin
+                global $tsml_programs;
+                tsml_define_strings() ;
+                $tsml_program = get_option('tsml_program', 'aa');
 
                 if(is_array($tsmp_filtering_types_what)){
                   $tsmp_filtering_types_displayed =  array_unique(array_merge ($tsmp_filtering_types_what, $meeting_types_in_use));
@@ -217,18 +213,12 @@ function tsmp_gen_page() {
                   $tsmp_filtering_types_displayed =   $meeting_types_in_use;
                 }
 
-                // $tsmp_filtering_types_displayed = sort(array_unique (array_merge ($tsmp_filtering_types_what, $meeting_types_in_use)));
-              //  $tsmp_filtering_types_displayed =  array_unique(array_merge ($tsmp_filtering_types_what, $meeting_types_in_use));
                 sort($tsmp_filtering_types_displayed);
 
                ?>
 
-
              <tr valign="top"><th scope="row">Filtering by Types</th>
                <td>
-
-
-
                  <table>
                    <tr>
                      <td style="vertical-align:top">
@@ -247,30 +237,26 @@ function tsmp_gen_page() {
                        <br>
 
                        <?php
+                       foreach ($tsml_programs[$tsml_program]['types'] as $key => $type) {
+                         echo "<input class='type_what_boxes' type='checkbox' name='tsmp_filtering_types_what[]' value='" . $key . "'" . (@in_array($key,$tsmp_filtering_types_what) ? 'checked' : '') ."  >" . $type . "<br>";
+
+                        //remove any meeting types from display array, this will leave only custom types
+                         if (($skey = array_search($key, $tsmp_filtering_types_displayed)) !== false) {
+                                unset($tsmp_filtering_types_displayed[$skey]);
+                            }
+
+                       }
+                       echo "custom types:<br>";
                        foreach ($tsmp_filtering_types_displayed as $each_type) {
                          echo "<input class='type_what_boxes' type='checkbox' name='tsmp_filtering_types_what[]' value='" . $each_type . "'" . (@in_array($each_type,$tsmp_filtering_types_what) ? 'checked' : '') ."  >" . $each_type . "<br>";
 
-                        // echo ' <option value="' . $layout   .  '" ' . ($tsmp_layout == $layout ? 'selected' : '') .  '>' . $layout . '</option>';
                        }
 
-                       ?>
-
-
+                 ?>
                      </td>
-
-
                    </tr>
-
                  </table>
-
-
-
-
-
                </td>
-
-
-
              </tr>
 
              <tr valign="top"><th scope="row">Paper Size</th>
