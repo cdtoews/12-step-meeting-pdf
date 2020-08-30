@@ -88,7 +88,7 @@ What it does:
 * gave human friendly description for type selections
 
 = 0.2.1a =
-* fixed but with empty selected types
+* fixed bug with empty selected types
 
 = 0.2.1 =
 * Added ability to filter by meeting type. whitelist and blacklist capabilities
