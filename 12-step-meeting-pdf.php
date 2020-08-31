@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/cdtoews/12-step-meeting-pdf
  * Description: Create PDF meeting list from the 12 Step Meeting List Plugin
  * code forked from https://github.com/meeting-guide/nyintergroup
- * Version: 0.2.2
+ * Version: 0.2.3
  * Author: Chris Toews
  * Author URI: https://yourtechguys.info
  * Text Domain: 12-step-meeting-pdf
@@ -153,7 +153,7 @@ $meetings = filter_meetings($meetings);
 	foreach ($meetings as $meeting) {
 
 		//we group meetings by group-at-location
-		$key = @$meeting['group_id'] . '-' . @$meeting['location_id'];
+		$key = @$meeting['id'] . '-' . @$meeting['location_id'];
 
 		//replace with parent category
 		if (array_key_exists($meeting['region_id'], $sub_sub_regions)) {
@@ -165,11 +165,15 @@ $meetings = filter_meetings($meetings);
 			$rows[$meeting['region_id']] = array();
 		}
 
+    //for viewing meeting data
+    // write_log($meeting);
+    // write_log("\n--------------------------------------");
+
 		//attach meeting to region
 		if (!array_key_exists($key, $rows[$meeting['region_id']])) {
 			$parts = explode(', ', $meeting['formatted_address']);
 			$rows[$meeting['region_id']][$key] = array(
-				'group' => @$meeting['group'],
+				'group' => @$meeting['name'],
 				'location' => @$meeting['location'],
 				'address' => $parts[0],
 				'postal_code' => substr($parts[2], 3),
