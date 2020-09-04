@@ -3,8 +3,8 @@ Contributors: cdtoews
 Donate link: https://paypal.me/cdtoews
 Tags: 12 step,12 step meeting, 12 step meetings, meeting list, 12 step meeting list
 Requires at least: 4.7
-Tested up to: 5.5
-Stable tag: 0.2.3
+Tested up to: 5.5.1
+Stable tag: 0.2.4
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -45,6 +45,8 @@ Yes, Any meetings you want included in the printed list, and not included in the
 = What do each of the values do in the plugin? =
 
 * Page Layout: This lets you choose between columns1, columns2 and table formats
+* Filter how: This determines if you are white-listing or black-listing types from the "filter what"
+* Filter what: this determines which meeting types are filtered
 * Paper size: some buttons to populate page width & height
 * Page Width: self explanatory
 * Page Height: self explanatory
@@ -57,6 +59,11 @@ Yes, Any meetings you want included in the printed list, and not included in the
 * Header Text: (column layout only) This is text that will show up at the top of each page, not each column. So this sometimes doesn't look good to have this populated once you fold the list.
 * Column2 Indent: This is the amount the pdf will indent to allow for the time. This might need to be changed if you change font size
 * HTML before meetings: (column layout only) This is anything you want printed before the meetings. this section can end up being insde a fold once you fold up your meeting list.
+* HTML on Specific Column: this section allows you to specify a column to put some html. this lets you fold your list funky ways
+       * enabled: this enables or disables this feature
+       * page number: this determines which page number has the custom column html (page numbers start at 1)
+       * column number: this determines what column number has the custom column html (column numbers start at 1)
+       * note that if the page and column numbers are not reached during parsing of meetings, the column html will not be included
 * HTML after meetings: (column layout only) This is anything you want printed after the meetings. This section can end up being the front of a folded meeting list.
 * **NOTE**: the HTML before and after meetings is rendered a div at a time, put all formatting inside your divs. A div will not be split across two columns
 * Column Count: (column layout only) How many columns you want printed, normally 3 or 4
@@ -83,6 +90,9 @@ What it does:
 1. No Screenshots yet
 
 == Changelog ==
+
+= 0.2.4 =
+* added feature for html on arbitrary page/column (by request of Regina AA)
 
 = 0.2.3 =
 * fixed bug in table1 output (thanks @webmasteraaneok)

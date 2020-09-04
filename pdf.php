@@ -329,6 +329,15 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	$page_height = get_option('tsmp_height');
 	$html_delimiter = "</div>";
 
+	// let's load column html params
+	$tsmp_column_html_array = get_option("tsmp_column_html");
+
+	$column_html_enable = isset($tsmp_column_html_array['enable']) ? $tsmp_column_html_array['enable'] : 0;
+	$column_html_page_num = $tsmp_column_html_array['page_num'];
+	$column_html_column_num = $tsmp_column_html_array['column_num'];
+	$column_html_html =  $tsmp_column_html_array['html'];
+
+
 	//calculate column width
 	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
 	$column_height = $page_height - ($margin_size * 2);
@@ -351,6 +360,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	$pdf->AddPage();
 
 	$current_column = 1;
+
 	//starting x,y for the start of this column
 	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 	$column_y = $margin_size;
@@ -411,6 +421,10 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			$column_y = $margin_size;
 			// $meeting_header = "";
 			// -------------------------------------------------------------------------
+
+			//write_log("page:" . $pdf->getPage() . " column:" .$current_column . "\n" );
+
+
 			$thisday = $mymeeting->get_formatted_day();
 			if($thisday !== $current_day){
 					$current_day = $thisday;
@@ -450,9 +464,23 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$column_y = $margin_size;
 				$pdf->SetXY($column_x,$column_y, true);
 
-				//see if we want custom html on this column
-				// ############################################################################
 
+				if($column_html_enable == 1 && $pdf->getPage() == $column_html_page_num  && $current_column == $column_html_column_num){
+					//put custom html in a certain column:
+					$pdf->MultiCell($column_width, 1,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+
+					$current_column++;
+					//now go to the next column (maybe page)
+					if($current_column > $number_of_columns){ //last column on the page
+						//need a new page
+						$pdf->AddPage();
+						$current_column = 1;
+					}
+					//reset X and Y to next column
+					$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+					$column_y = $margin_size;
+					$pdf->SetXY($column_x,$column_y, true);
+				} // end of column_html_block
 
 				//write the text on the new column [and page ]
 				$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
@@ -545,9 +573,22 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$pdf->SetXY($column_x,$column_y, true);
 
 
-				//see if we want custom html on this column
-				// ############################################################################
-				
+				if($column_html_enable == 1 && $pdf->getPage() == $column_html_page_num  && $current_column == $column_html_column_num){
+					//put custom html in a certain column:
+					$pdf->MultiCell($column_width, 1,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+
+					$current_column++;
+					//now go to the next column (maybe page)
+					if($current_column > $number_of_columns){ //last column on the page
+						//need a new page
+						$pdf->AddPage();
+						$current_column = 1;
+					}
+					//reset X and Y to next column
+					$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+					$column_y = $margin_size;
+					$pdf->SetXY($column_x,$column_y, true);
+				} // end of column_html_block
 
 
 

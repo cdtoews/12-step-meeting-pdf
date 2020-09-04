@@ -3,6 +3,7 @@
 function tsmp_gen_page() {
   require_once('sample_post.php');
   require_once('sample_meeting.php');
+  require_once('sample_column_html.php');
 // settings page
 
   // https://cdnjs.cloudflare.com/ajax/libs/NicEdit/0.93/nicEdit.js
@@ -62,6 +63,7 @@ function tsmp_gen_page() {
   var samples = {
     "tsmp_outtro_html": <?php echo json_encode($sample_post); ?>,
     "tsmp_custom_meeting_html": <?php echo json_encode($sample_meeting); ?>,
+    "tsmp_column_html" : <?php echo json_encode($sample_column_html); ?>,
   };
 
 //load sample strings when called
@@ -371,16 +373,12 @@ function tsmp_gen_page() {
             $tsmp_default_values = array('enable' => 0,
                                           'html' => '',
                                           'page_num' => 0,
-                                          'column_num' => 0,
-                                          'test'  => 42
+                                          'column_num' => 0
                                         );
             foreach($tsmp_default_values as $key => $value){
                 if(!isset($tsmp_column_html_array[$key])){
                   $tsmp_column_html_array[$key] = $value;
                 }
-
-
-
             }
 
             //let's try unregistering
@@ -393,7 +391,8 @@ function tsmp_gen_page() {
                  </tr>
 
                  <tr class="column_row tr_with_border"  valign="top"><th scope="row">HTML on specific Column<br>
-               <button type=button onclick="toggleArea1('tsmp_column_html[html]');">Toggle  Editor</button>
+               <button type=button onclick="toggleArea1('tsmp_column_html[html]');">Toggle  Editor</button><br>
+                <button type=button id="tsmp_column_html_load" onclick="loaddata('tsmp_column_html','tsmp_column_html[html]')" >Load Sample Data</button>
               <br><br>
               enabled
               <input onchange="updateVarView()" type="checkbox" id="tsmp_column_html[enable]" name="tsmp_column_html[enable]" value="1" <?php echo ( ($tsmp_column_html_array['enable'] == 1) ? "checked": ""); ?>
