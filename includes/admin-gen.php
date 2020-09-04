@@ -351,12 +351,66 @@ function tsmp_gen_page() {
                </tr>
 
 
-               <tr class="column_row" ><td colspan="2"><font -2>note on html, each div rendered seperately<br>and column breaks will only fall on close of div</font>
+               <tr class="column_row" ><td colspan="2"><font -2>note on html for before and after, each div rendered seperately<br>
+                 and column breaks will only fall on close of div<br>
+               html for specific column works differently.</font>
                </td></tr>
                <tr  class="column_row tr_with_border"  valign="top"><th scope="row">HTML before meetings<br>
                <button type=button onclick="toggleArea1('tsmp_intro_html');">Toggle  Editor</button></th>
                    <td><textarea rows="10" cols="70" id="tsmp_intro_html" name="tsmp_intro_html" ><?php echo get_option('tsmp_intro_html'); ?></textarea></td>
                </tr>
+
+               <tr  >
+                 <td colspan="2"><font -2>HTML on sepcific column will only function with column layouts<br>
+                 If you put too much in the column, you can break the layout.<br>
+               With great power comes great responsibilitupdate_optiony </font></td>
+
+<?php
+            // let's load column html params
+            $tsmp_column_html_array = get_option("tsmp_column_html");
+            $tsmp_default_values = array('enable' => 0,
+                                          'html' => '',
+                                          'page_num' => 0,
+                                          'column_num' => 0,
+                                          'test'  => 42
+                                        );
+            foreach($tsmp_default_values as $key => $value){
+                if(!isset($tsmp_column_html_array[$key])){
+                  $tsmp_column_html_array[$key] = $value;
+                }
+
+
+
+            }
+
+            //let's try unregistering
+            //update_option( 'tsmp_column_html', array('html' => 'huh'));
+
+
+
+ ?>
+
+                 </tr>
+
+                 <tr class="column_row tr_with_border"  valign="top"><th scope="row">HTML on specific Column<br>
+               <button type=button onclick="toggleArea1('tsmp_column_html[html]');">Toggle  Editor</button>
+              <br><br>
+              enabled
+              <input onchange="updateVarView()" type="checkbox" id="tsmp_column_html[enable]" name="tsmp_column_html[enable]" value="1" <?php echo ( ($tsmp_column_html_array['enable'] == 1) ? "checked": ""); ?>
+               checked( 1, $options['checkbox_example'], false ) /><br>
+               Page Number:
+               <input type="text" size="2" id="tsmp_column_html[page_num]" name="tsmp_column_html[page_num]" value="<?php echo $tsmp_column_html_array['page_num'] ; ?>" />
+               <br>
+               Column Number:
+               <input type="text" size="3" id="tsmp_column_html[column_num]" name="tsmp_column_html[column_num]" value="<?php echo $tsmp_column_html_array['column_num'] ; ?>" />
+               <br>
+
+
+             </th>
+                   <td><textarea rows="10" cols="70" id="tsmp_column_html[html]" name="tsmp_column_html[html]" ><?php echo $tsmp_column_html_array['html']; ?></textarea></td>
+               </tr>
+
+
                <tr class="column_row tr_with_border"  valign="top"><th scope="row">HTML after meetings<br><br>
                <button type=button onclick="toggleArea1('tsmp_outtro_html');">Toggle  Editor</button><br><br>
                <button type=button id="tsmp_outtro_html_load" onclick="loaddata('tsmp_outtro_html','tsmp_outtro_html')" >Load Sample Data</button>
@@ -404,6 +458,7 @@ function tsmp_gen_page() {
 
 //for debugging:
 if(1==2){
+  echo "<h2> Options </h2><br>";
   echo "tsmp_column_padding :" .  get_option('tsmp_column_padding') . "<br>";
   echo "tsmp_column_count :" .  get_option('tsmp_column_count') . "<br>";
   echo "tsmp_margin :" .  get_option('tsmp_margin') . "<br>";
@@ -414,14 +469,31 @@ if(1==2){
 print_r(get_option('tsmp_filtering_types_what') );
   echo "<br>";
 
+
+  echo "tsmp_column_html :";
+print_r(get_option('tsmp_column_html') );
+  echo "<br>";
+
+
   echo "tsmp_intro_html :" .  get_option('tsmp_intro_html') . "<br>";
   echo "tsmp_outtro_html :" .  get_option('tsmp_outtro_html') . "<br>";
 
 
 
+echo "<h2>all options</h2><br>";
+
+$all_options = wp_load_alloptions();
+
+foreach ( $all_options as $name => $value ) {
+  echo "-- " . $name . " : ";
+  $thisValue = get_option($name);
+  print_r($thisValue);
+  echo "<br>";
+
+}
 
 
-echo "post types: <br>";
+echo "<h2>post types:</h2> <br>";
   foreach ( get_post_types( '', 'names' ) as $post_type ) {
      echo '<p>' . $post_type . '</p>';
   }
@@ -517,7 +589,10 @@ setEntryListeners(document.getElementById("tsmp_custom_meeting_html"));
 setEntryListeners(document.getElementById("tsmp_save_file_name"));
 setEntryListeners(document.getElementById("tsmp_set_save_file"));
 setEntryListeners(document.getElementById("tsmp_table_region_new_page"));
-
+setEntryListeners(document.getElementById("tsmp_column_html[enable]"));
+setEntryListeners(document.getElementById("tsmp_column_html[page_num]"));
+setEntryListeners(document.getElementById("tsmp_column_html[column_num]"));
+setEntryListeners(document.getElementById("tsmp_column_html[html]"));
 setEntryListeners(document.getElementById("no_filtering"));
 setEntryListeners(document.getElementById("white_list"));
 setEntryListeners(document.getElementById("black_list"));

@@ -128,7 +128,12 @@ function tsmp_options_init(){
                                           //comma seperated list of types being filterd
                           );
 
+          register_setting( 'tsmp-settings-group', 'tsmp_column_html', array(
+                                            'type' => 'array',
+                                            'default' => '',
+                                            )
 
+                            );
 
 
       }

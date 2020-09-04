@@ -125,7 +125,7 @@
 		//$pdf->Output('meeting_list.pdf', 'I');
 		//exit;
 	}else{
-		echo 'something is wrong, page_layout not specified correctly';
+		echo 'something is incredibly wrong, page_layout not specified correctly. How did that happen?';
 		exit;
 	}
 
@@ -429,7 +429,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			if ($end_page == $start_page) {
 				//if we are still onthe same page, commit
 				$pdf->commitTransaction();
-			}else{ //we would have popped to a new page
+			}else{ //we would have popped to a new page (meaning we need to go to the next column)
 				$pdf = $pdf->rollbackTransaction();
 
 				if($thisday !== $current_day){
@@ -449,6 +449,11 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 				$column_y = $margin_size;
 				$pdf->SetXY($column_x,$column_y, true);
+
+				//see if we want custom html on this column
+				// ############################################################################
+
+
 				//write the text on the new column [and page ]
 				$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
 
@@ -538,6 +543,14 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 				$column_y = $margin_size;
 				$pdf->SetXY($column_x,$column_y, true);
+
+
+				//see if we want custom html on this column
+				// ############################################################################
+				
+
+
+
 				//write the text on the new column [and page ]
 				$pdf->MultiCell($column_width, 1, $meeting_header  , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 				//on a new column, we are always going to write the time, so no need for the if
