@@ -206,7 +206,6 @@ function tsmp_gen_page() {
 
                 //pull eeting types from other plugin
                 global $tsml_programs;
-                tsml_define_strings() ;
                 $tsml_program = get_option('tsml_program', 'aa');
 
                 if(is_array($tsmp_filtering_types_what)){
