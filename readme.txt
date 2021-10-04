@@ -91,6 +91,9 @@ What it does:
 
 == Changelog ==
 
+= 0.3.0 =
+* fixed bug, thanks to Josh Reisner
+
 = 0.2.4 =
 * added feature for html on arbitrary page/column (by request of Regina AA)
 
