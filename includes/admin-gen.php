@@ -96,10 +96,10 @@ function tsmp_gen_page() {
   }
 
   //hide types list if not Filtering
-  function hide_show_types(filtering_types_radio){
+  function hide_show_types(){
     //get radio value
-    var radio_value = filtering_types_radio.value;
-    if(radio_value == 'n'){
+
+    if(document.getElementById("no_filtering").checked){
       document.getElementById('type_td').style.display = "none";
     }else{
       document.getElementById('type_td').style.display = "block";
@@ -109,6 +109,7 @@ function tsmp_gen_page() {
 
   function updateVarView(){
     //let's determine which to hide and which to show
+    hide_show_types();
     //read id tsmp_layout
     var x = document.getElementById("tsmp_layout").selectedIndex;
     var dropDownValue = document.getElementsByTagName("option")[x].value;
@@ -203,6 +204,48 @@ function tsmp_gen_page() {
                    ?>
                  </td>
              </tr>
+
+             <?php
+               $attendance_option_filtering = get_option('attendance_option_filtering');
+
+               //if how not properly defined, set to none
+               if($attendance_option_filtering != 'online' && $attendance_option_filtering != 'in_person' && $attendance_option_filtering != 'hybrid'){
+                 $attendance_option_filtering = 'all';
+               }
+
+            ?>
+
+             <tr valign="top">
+        <th scope="row">Filtering by Attendance Options</th>
+
+
+
+
+
+
+                   <td style="vertical-align:top">
+
+                     <input type="radio" id="attendance_all" name="attendance_option_filtering" value="all"  <?php echo ($attendance_option_filtering == 'all' ? 'checked' : '') ?>>
+                      <label for="attendance_all">All (no filtering)</label><br>
+                      <input type="radio" id="attendance_online" name="attendance_option_filtering" value="online"   <?php echo ($attendance_option_filtering == 'online' ? 'checked' : '') ?>>
+                      <label for="attendance_online">Online</label><br>
+                      <input type="radio" id="attendance_in_person" name="attendance_option_filtering" value="in_person"   <?php echo ($attendance_option_filtering == 'in_person' ? 'checked' : '') ?>>
+                      <label for="attendance_in_person">In Person</label><br>
+                      <input type="radio" id="attendance_hybrid" name="attendance_option_filtering" value="hybrid"   <?php echo ($attendance_option_filtering == 'hybrid' ? 'checked' : '') ?>>
+                      <label for="attendance_hybrid">Hybrid</label>
+                   </td>
+
+
+
+
+             </tr>
+
+             <tr>
+              <td colspan="2">
+                <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attendance and type filters are combined with an <a href="https://preview.redd.it/ecnonykb5cv51.png?width=960&crop=smart&auto=webp&s=191b56595a937d5f7e18d461a53a79b6cd21ce3b" target="_blank">AND</a>  (as opposed to an OR)</strong>
+               </td>
+             </tr>
+
 
               <?php
                 $tsmp_filtering_types_how = get_option('tsmp_filtering_types_how');
@@ -391,10 +434,6 @@ function tsmp_gen_page() {
                 }
             }
 
-            //let's try unregistering
-            //update_option( 'tsmp_column_html', array('html' => 'huh'));
-
-
 
  ?>
 
@@ -473,22 +512,24 @@ if(1==2){
   echo "tsmp_margin :" .  get_option('tsmp_margin') . "<br>";
   echo "tsmp_font_size :" .  get_option('tsmp_font_size') . "<br>";
   echo "tsmp_header :" .  get_option('tsmp_header') . "<br>";
+  echo "attendance_option_filtering :" .  get_option('attendance_option_filtering') . "<br>";
   echo "tsmp_filtering_types_how :" .  get_option('tsmp_filtering_types_how') . "<br>";
   echo "tsmp_filtering_types_what :";
 print_r(get_option('tsmp_filtering_types_what') );
   echo "<br>";
-
+echo "<hr>";
 
   echo "tsmp_column_html :";
 print_r(get_option('tsmp_column_html') );
   echo "<br>";
-
+echo "<hr>";
 
   echo "tsmp_intro_html :" .  get_option('tsmp_intro_html') . "<br>";
+  echo "<hr>";
   echo "tsmp_outtro_html :" .  get_option('tsmp_outtro_html') . "<br>";
 
-
-
+echo "<hr>";
+  echo "<br>";
 echo "<h2>all options</h2><br>";
 
 $all_options = wp_load_alloptions();
@@ -605,6 +646,11 @@ setEntryListeners(document.getElementById("tsmp_column_html[html]"));
 setEntryListeners(document.getElementById("no_filtering"));
 setEntryListeners(document.getElementById("white_list"));
 setEntryListeners(document.getElementById("black_list"));
+setEntryListeners(document.getElementById("attendance_all"));
+setEntryListeners(document.getElementById("attendance_online"));
+setEntryListeners(document.getElementById("attendance_in_person"));
+setEntryListeners(document.getElementById("attendance_hybrid"));
+
 
 
 

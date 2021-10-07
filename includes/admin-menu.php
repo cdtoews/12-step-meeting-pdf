@@ -134,9 +134,9 @@ function tsmp_options_init(){
                                             )
 
                             );
-          register_setting( 'tsmp-settings-group', 'attendance_option_filtering)', array(
+          register_setting( 'tsmp-settings-group', 'attendance_option_filtering', array(
                                             'type' => 'array',
-                                            'default' => 'none',
+                                            'default' => 'all',
                                             )
 
                             );
