@@ -95,6 +95,17 @@ function tsmp_gen_page() {
         areas[id] = area1;
   }
 
+  //hide types list if not Filtering
+  function hide_show_types(filtering_types_radio){
+    //get radio value
+    var radio_value = filtering_types_radio.value;
+    if(radio_value == 'n'){
+      document.getElementById('type_td').style.display = "none";
+    }else{
+      document.getElementById('type_td').style.display = "block";
+    }
+
+  }
 
   function updateVarView(){
     //let's determine which to hide and which to show
@@ -224,16 +235,16 @@ function tsmp_gen_page() {
                    <tr>
                      <td style="vertical-align:top">
                        Filter how:<br>
-                       <input type="radio" id="white_list" name="tsmp_filtering_types_how" value="w" <?php echo ($tsmp_filtering_types_how == 'w' ? 'checked' : '') ?>>
+                       <input type="radio" id="white_list" name="tsmp_filtering_types_how" value="w" onclick="hide_show_types(this);" <?php echo ($tsmp_filtering_types_how == 'w' ? 'checked' : '') ?>>
                         <label for="white_list">White List</label><br>
-                        <input type="radio" id="black_list" name="tsmp_filtering_types_how" value="b" <?php echo ($tsmp_filtering_types_how == 'b' ? 'checked' : '') ?>>
+                        <input type="radio" id="black_list" name="tsmp_filtering_types_how" value="b" onclick="hide_show_types(this);"  <?php echo ($tsmp_filtering_types_how == 'b' ? 'checked' : '') ?>>
                         <label for="black_list">Black List</label><br>
-                        <input type="radio" id="no_filtering" name="tsmp_filtering_types_how" value="n" <?php echo ($tsmp_filtering_types_how == 'n' ? 'checked' : '') ?>>
+                        <input type="radio" id="no_filtering" name="tsmp_filtering_types_how" value="n" onclick="hide_show_types(this);"  <?php echo ($tsmp_filtering_types_how == 'n' ? 'checked' : '') ?>>
                         <label for="no_filtering">No Filtering</label>
                      </td>
                      <td width='1' style="border-right: 3px solid #cdd0d4;">
                      </td>
-                     <td style="vertical-align:top">
+                     <td id="type_td" style="vertical-align:top">
                        filter what: ( <a href="https://github.com/code4recovery/12-step-meeting-list/blob/master/includes/variables.php#L501" target="_blank"> list of types</a> )
                        <br>
 
