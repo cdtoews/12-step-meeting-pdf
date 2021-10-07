@@ -208,11 +208,15 @@ function tsmp_gen_page() {
              <?php
                $attendance_option_filtering = get_option('attendance_option_filtering');
 
-               //if how not properly defined, set to none
-               if($attendance_option_filtering != 'online' && $attendance_option_filtering != 'in_person' && $attendance_option_filtering != 'hybrid'){
+               //if not properly defined, set to none
+               if($attendance_option_filtering != 'online' &&
+               $attendance_option_filtering != 'in_person' &&
+               $attendance_option_filtering != 'online_only' &&
+               $attendance_option_filtering != 'in_person_only' &&
+               $attendance_option_filtering != 'hybrid'){
                  $attendance_option_filtering = 'all';
                }
-
+              //Give someone a hug today
             ?>
 
              <tr valign="top">
@@ -227,10 +231,19 @@ function tsmp_gen_page() {
 
                      <input type="radio" id="attendance_all" name="attendance_option_filtering" value="all"  <?php echo ($attendance_option_filtering == 'all' ? 'checked' : '') ?>>
                       <label for="attendance_all">All (no filtering)</label><br>
+
                       <input type="radio" id="attendance_online" name="attendance_option_filtering" value="online"   <?php echo ($attendance_option_filtering == 'online' ? 'checked' : '') ?>>
-                      <label for="attendance_online">Online</label><br>
+                      <label for="attendance_online">Online (including Hybrid)</label><br>
+
+                      <input type="radio" id="attendance_online_only" name="attendance_option_filtering" value="online_only"   <?php echo ($attendance_option_filtering == 'online_only' ? 'checked' : '') ?>>
+                      <label for="attendance_online">Online only (not including Hybrid)</label><br>
+
                       <input type="radio" id="attendance_in_person" name="attendance_option_filtering" value="in_person"   <?php echo ($attendance_option_filtering == 'in_person' ? 'checked' : '') ?>>
-                      <label for="attendance_in_person">In Person</label><br>
+                      <label for="attendance_in_person">In Person (including Hybrid) </label><br>
+
+                      <input type="radio" id="attendance_in_person_only" name="attendance_option_filtering" value="in_person_only"   <?php echo ($attendance_option_filtering == 'in_person_only' ? 'checked' : '') ?>>
+                      <label for="attendance_in_person">In Person only  (not including Hybrid)</label><br>
+
                       <input type="radio" id="attendance_hybrid" name="attendance_option_filtering" value="hybrid"   <?php echo ($attendance_option_filtering == 'hybrid' ? 'checked' : '') ?>>
                       <label for="attendance_hybrid">Hybrid</label>
                    </td>
@@ -649,6 +662,8 @@ setEntryListeners(document.getElementById("black_list"));
 setEntryListeners(document.getElementById("attendance_all"));
 setEntryListeners(document.getElementById("attendance_online"));
 setEntryListeners(document.getElementById("attendance_in_person"));
+setEntryListeners(document.getElementById("attendance_online_only"));
+setEntryListeners(document.getElementById("attendance_in_person_only"));
 setEntryListeners(document.getElementById("attendance_hybrid"));
 
 

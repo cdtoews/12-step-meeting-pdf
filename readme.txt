@@ -91,6 +91,9 @@ What it does:
 
 == Changelog ==
 
+= 0.3.1 =
+* Added ability to filter by attendance type (online, in person, hybrid)
+
 = 0.3.0 =
 * fixed bug, thanks to Josh Reisner
 

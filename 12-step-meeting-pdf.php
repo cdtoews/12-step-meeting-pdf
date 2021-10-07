@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/cdtoews/12-step-meeting-pdf
  * Description: Create PDF meeting list from the 12 Step Meeting List Plugin
  * code forked from https://github.com/meeting-guide/nyintergroup
- * Version: 0.3.0
+ * Version: 0.3.1
  * Author: Chris Toews
  * Author URI: https://yourtechguys.info
  * Text Domain: 12-step-meeting-pdf
@@ -313,6 +313,7 @@ $meetings = filter_meetings($meetings);
 function filter_meetings($meetings){
 
   $filtered_meetings = array();
+  $attendance_filtered_meetings = array();
   $tsmp_filtering_types_what = get_option('tsmp_filtering_types_what');
   //in_array($each_type,$tsmp_filtering_types_what)
   $tsmp_filtering_types_how = get_option('tsmp_filtering_types_how');
@@ -338,13 +339,44 @@ function filter_meetings($meetings){
     }
   }else{
     //if not either, assume  no filtering
-    return $meetings;
+    $filtered_meetings = $meetings;
   }
 
+  //now filter attendance options
+  $attendance_option_filtering = get_option('attendance_option_filtering');
+  if($attendance_option_filtering == 'all' || $attendance_option_filtering == ''){
+    return $filtered_meetings;
+  }else{
+    //let's do some filtering
+    if($attendance_option_filtering == 'online' || $attendance_option_filtering == 'in_person'){
+      //if we are in here, we want to include hybrid meetings
+        foreach ($filtered_meetings as $meeting) {
+      $this_attendance_type = $meeting['attendance_option'];
+      if($this_attendance_type == $attendance_option_filtering || $this_attendance_type == 'hybrid'){
+        array_push($attendance_filtered_meetings, $meeting);
+      }
+    }
+    }else{
+      //if in_person_only, online_only, or hybrid, just match
+      //need to set matching term
+      $matching_term = "";
+      if($attendance_option_filtering == 'online_only'){
+        $matching_term = "online";
+      }elseif ($attendance_option_filtering == 'in_person_only') {
+        $matching_term = "in_person";
+      }elseif ($attendance_option_filtering == 'hybrid') {
+          $matching_term = "hybrid";
+      }
+      foreach ($filtered_meetings as $meeting) {
+        $this_attendance_type = $meeting['attendance_option'];
+        if($this_attendance_type == $matching_term){
+          array_push($attendance_filtered_meetings, $meeting);
+        }
+      }
 
+    }
+  }
+//Tell someone they are loved today
 
-
-
-
-  return $filtered_meetings;
+  return $attendance_filtered_meetings;
 }
