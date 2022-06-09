@@ -91,6 +91,9 @@ What it does:
 
 == Changelog ==
 
+= 0.3.2 =
+* Attempting to make PHP 8 compatible, still having issues with TCPDF
+
 = 0.3.1 =
 * Added ability to filter by attendance type (online, in person, hybrid)
 

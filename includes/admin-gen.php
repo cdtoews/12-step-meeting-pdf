@@ -306,7 +306,7 @@ function tsmp_gen_page() {
 
                        <?php
                        foreach ($tsml_programs[$tsml_program]['types'] as $key => $type) {
-                         echo "<input class='type_what_boxes' type='checkbox' name='tsmp_filtering_types_what[]' value='" . $key . "'" . (@in_array($key,$tsmp_filtering_types_what) ? 'checked' : '') ."  >" . $type . "<br>";
+                         echo "<input class='type_what_boxes' type='checkbox' name='tsmp_filtering_types_what[]' value='" . $key . "'" . (is_array($tsmp_filtering_types_what) ? (@in_array($key,$tsmp_filtering_types_what) ? 'checked' : '') : '') ."  >" . $type . "<br>";
 
                         //remove any meeting types from display array, this will leave only custom types
                          if (($skey = array_search($key, $tsmp_filtering_types_displayed)) !== false) {
@@ -436,6 +436,10 @@ function tsmp_gen_page() {
 <?php
             // let's load column html params
             $tsmp_column_html_array = get_option("tsmp_column_html");
+            //if not an array, meaning there's nothing there, let's just make it an array
+            if(!is_array($tsmp_column_html_array)){
+              $tsmp_column_html_array = [];
+            }
             $tsmp_default_values = array('enable' => 0,
                                           'html' => '',
                                           'page_num' => 0,

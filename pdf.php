@@ -1,6 +1,6 @@
 <?php
-
-
+set_time_limit(120);
+ini_set('memory_limit', '-1');
 	add_action('wp_ajax_step_pdf', function(){
 
 	//must be a logged-in user to run this page (otherwise last_contact will be null)
@@ -19,8 +19,8 @@
 
 			if ($header_text != "") {
 				// Set font
-				$header_font_size = get_option("tsmp_header_font_size");
-				$this->SetFont('helvetica', 'B', $header_font_size);
+				$header_font_size = (int)  get_option("tsmp_header_font_size");
+				$this->SetFont('freeserif', 'B', $header_font_size);
 
 				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
 			}
@@ -34,10 +34,10 @@
 			(substr($page_layout, 0, strlen("columns")) === "columns"  )  ){
 		//working for columns1, untested with columns2
 		$optimal_size = NULL;
-		$current_size = abs(get_option('tsmp_font_size'));
+		$current_size = (int)  abs(get_option('tsmp_font_size'));
 		$over = NULL;
 		$under = NULL;
-		$desired_page_count = get_option('tsmp_desired_page_count');
+		$desired_page_count = (int)  get_option('tsmp_desired_page_count');
 		$loop_counter = 0;
 		$layout_type = substr($page_layout, -1);
 		do{
@@ -168,15 +168,15 @@ function tsmp_create_pdf_table1(){
 	//don't show these in indexes
 	$exclude_from_indexes	= array('Beginner', 'Candlelight', 'Closed', 'Grapevine', 'Literature', 'Open', 'Topic Discussion');
 
-	$margin_size = get_option('tsmp_margin');
-	$font_size = get_option('tsmp_font_size');
-	$header_font_size = get_option("tsmp_header_font_size");
-	$number_of_columns = get_option('tsmp_column_count');
-	$column_padding = get_option('tsmp_column_padding');
+	$margin_size = (int) get_option('tsmp_margin');
+	$font_size =  (int) get_option('tsmp_font_size');
+	$header_font_size =  (int) get_option("tsmp_header_font_size");
+	$number_of_columns = (int)  get_option('tsmp_column_count');
+	$column_padding = (int)  get_option('tsmp_column_padding');
 	$outtro_text = get_option('tsmp_outtro_html');
 	$intro_text = get_option('tsmp_intro_html');
-	$page_width = get_option('tsmp_width');
-	$page_height = get_option('tsmp_height');
+	$page_width = (int)  get_option('tsmp_width');
+	$page_height = (int) get_option('tsmp_height');
 	$region_new_page = get_option('tsmp_table_region_new_page');
 
 
@@ -225,6 +225,7 @@ function tsmp_create_pdf_table1(){
 
 	//create new PDF
 	$pdf = new TableTCPDF();
+	$pdf->SetFont('freeserif', 'B', $header_font_size);
 	if ($region_new_page == 0){
 		//if we aren't having a new page each region, we need to make our first one here
 		$pdf->NewPage();
@@ -315,27 +316,35 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	do_settings_sections( 'tsmp-settings-group' );
 
 	//need to add variable validation for mortals
-	$margin_size = get_option('tsmp_margin');
+	$margin_size = (int)  get_option('tsmp_margin');
 	if(is_null($arg_font_size)){
-		$font_size = get_option('tsmp_font_size');
+		$font_size = (int)  get_option('tsmp_font_size');
 	}else{
 		$font_size = $arg_font_size;
 	}
-	$number_of_columns = get_option('tsmp_column_count');
-	$column_padding = get_option('tsmp_column_padding');
+	$number_of_columns = (int) get_option('tsmp_column_count');
+	$column_padding = (int)  get_option('tsmp_column_padding');
 	$outtro_text = get_option('tsmp_outtro_html');
 	$intro_text = get_option('tsmp_intro_html');
-	$page_width = get_option('tsmp_width');
-	$page_height = get_option('tsmp_height');
+	$page_width = (int)  get_option('tsmp_width');
+	$page_height = (int)  get_option('tsmp_height');
 	$html_delimiter = "</div>";
 
 	// let's load column html params
 	$tsmp_column_html_array = get_option("tsmp_column_html");
 
-	$column_html_enable = isset($tsmp_column_html_array['enable']) ? $tsmp_column_html_array['enable'] : 0;
-	$column_html_page_num = $tsmp_column_html_array['page_num'];
-	$column_html_column_num = $tsmp_column_html_array['column_num'];
-	$column_html_html =  $tsmp_column_html_array['html'];
+	if(is_array($tsmp_column_html_array)){
+		$column_html_enable = isset($tsmp_column_html_array['enable']) ? $tsmp_column_html_array['enable'] : 0;
+		$column_html_page_num = $tsmp_column_html_array['page_num'];
+		$column_html_column_num = $tsmp_column_html_array['column_num'];
+		$column_html_html =  $tsmp_column_html_array['html'];
+	}else{
+		$column_html_enable = 0;
+		$column_html_page_num = 0;
+		$column_html_column_num = 0;
+		$column_html_html = '';
+	}
+
 
 
 	//calculate column width
@@ -353,7 +362,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 	$pageLayout = array($page_width, $page_height);
 	$pdf = new COLUMNPDF("", PDF_UNIT, $pageLayout, true, 'UTF-8', false);
-	$pdf->SetFont('helvetica', '', $font_size);
+	$pdf->SetFont('freeserif', '', $font_size);
 
 	$pdf->SetMargins($margin_size, $margin_size, $margin_size, true);
 	$pdf->SetAutoPageBreak(TRUE, $margin_size);
@@ -496,7 +505,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 		// ----------------------------------------------------------
 		//                      Layout 2
 		// ----------------------------------------------------------
-		$column2_indent = get_option('tsmp_column2_indent'); //indent for Time
+		$column2_indent = (int) get_option('tsmp_column2_indent'); //indent for Time
 		$column_header_indent = 0;
 		$y_adjustment = -3;
 		$current_day = "";
