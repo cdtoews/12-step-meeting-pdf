@@ -91,6 +91,9 @@ What it does:
 
 == Changelog ==
 
+= 1.0.1 =
+* Switching to fpdf to become PHP 8 compatible
+
 = 0.3.2 =
 * Attempting to make PHP 8 compatible, still having issues with TCPDF
 
