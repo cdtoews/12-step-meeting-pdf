@@ -1,6 +1,6 @@
 <?php
 
-class TableTCPDF extends TCPDF {
+class TableTCPDF extends FPDF {
 //get_option('tsmp_first_page_no');
 
 

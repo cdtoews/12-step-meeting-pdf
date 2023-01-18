@@ -10,9 +10,10 @@ ini_set('memory_limit', '-1');
 		die('you do not have access to view this page');
 	}
 
-	require_once('vendor/autoload.php');
+	require('vendor/fpdf/fpdf.php');
+	//require_once('vendor/autoload.php');
 	// Extend the TCPDF class to create custom Header and Footer
-	class COLUMNPDF extends TCPDF {
+	class COLUMNPDF extends FPDF {
 		//Page header
 		public function Header() {
 			$header_text = get_option('tsmp_header');
@@ -20,9 +21,9 @@ ini_set('memory_limit', '-1');
 			if ($header_text != "") {
 				// Set font
 				$header_font_size = (int)  get_option("tsmp_header_font_size");
-				$this->SetFont('freeserif', 'B', $header_font_size);
+				$this->SetFont('Arial', 'B', $header_font_size);
 
-				$this->Cell(0, 15, $header_text, 0, false, 'C', 0, '', 0, false, 'M', 'B');
+				$this->Cell(0, 15, $header_text);
 			}
 		}
 	}//end of class
@@ -44,7 +45,7 @@ ini_set('memory_limit', '-1');
 
 			//first let's get a pdf and see what size it is
 			$pdf = tsmp_create_pdf_columns($layout_type, $current_size); //when we add columns2, we'll need to take that into consideration
-			$number_of_pages = $pdf->getPage();
+			$number_of_pages = $pdf->PageNo();
 
 
 			if($number_of_pages < $desired_page_count){
@@ -361,8 +362,16 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	//create new PDF
 
 	$pageLayout = array($page_width, $page_height);
-	$pdf = new COLUMNPDF("", PDF_UNIT, $pageLayout, true, 'UTF-8', false);
-	$pdf->SetFont('freeserif', '', $font_size);
+	$orientation;
+	if($page_height > $page_width){
+		$orientation = "P"; //Portrait
+	}else{
+		$orientation = "L"; //Landscape
+	}
+
+
+	$pdf = new COLUMNPDF($orientation, "mm", $pageLayout);
+	$pdf->SetFont('Arial', '', $font_size);
 
 	$pdf->SetMargins($margin_size, $margin_size, $margin_size, true);
 	$pdf->SetAutoPageBreak(TRUE, $margin_size);
@@ -385,18 +394,17 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			$html_block .= $html_delimiter; //put back what we striped out
 
 			//get start page to see if adding this text would send it over the edge
-			$start_page = $pdf->getPage();
+			$start_page = $pdf->PageNo();
 
 			//start a transaction, so if it goes over the edge of the page, we can rollback
-			$pdf->startTransaction();
+			//$pdf->startTransaction(); // fpdf doens't support transactions
+			$_pdf =  clone $pdf;
 			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
-			$end_page = $pdf->getPage();
+			$end_page = $pdf->PageNo();
 
-			if ($end_page == $start_page) {
-				//if we are still onthe same page
-				$pdf->commitTransaction();
-			}else{ //we would have popped to a new page
-				$pdf = $pdf->rollbackTransaction();
+			if ($end_page != $start_page) {
+ 					//we would have popped to a new page
+				$pdf = $_pdf; //restore to previous state
 				$current_column++;
 
 				if($current_column > $number_of_columns){ //last column on the page
@@ -431,7 +439,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			// $meeting_header = "";
 			// -------------------------------------------------------------------------
 
-			//write_log("page:" . $pdf->getPage() . " column:" .$current_column . "\n" );
+			//write_log("page:" . $pdf->PageNo() . " column:" .$current_column . "\n" );
 
 
 			$thisday = $mymeeting->get_formatted_day();
@@ -442,18 +450,17 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$meeting_header = "<hr>";
 			}
 
-			$start_page = $pdf->getPage();
+			$start_page = $pdf->PageNo();
 			//write_log("column width:" . $column_width);
-			$pdf->startTransaction();
+
+			$_pdf =  clone $pdf;
 			$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
-			$end_page = $pdf->getPage();
+			$end_page = $pdf->PageNo();
 
 
-			if ($end_page == $start_page) {
-				//if we are still onthe same page, commit
-				$pdf->commitTransaction();
-			}else{ //we would have popped to a new page (meaning we need to go to the next column)
-				$pdf = $pdf->rollbackTransaction();
+			if ($end_page != $start_page) {
+ 					//we would have popped to a new page (meaning we need to go to the next column)
+				$pdf = $_pdf; //restore to previous state
 
 				if($thisday !== $current_day){
 					//<div style="background-color:black">
@@ -474,7 +481,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$pdf->SetXY($column_x,$column_y, true);
 
 
-				if($column_html_enable == 1 && $pdf->getPage() == $column_html_page_num  && $current_column == $column_html_column_num){
+				if($column_html_enable == 1 && $pdf->PageNo() == $column_html_page_num  && $current_column == $column_html_column_num){
 					//put custom html in a certain column:
 					$pdf->MultiCell($column_width, 1,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 
@@ -537,9 +544,10 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			}
 
 
-			$start_page = $pdf->getPage();
+			$start_page = $pdf->PageNo();
 			//write_log("column width:" . $column_width);
-			$pdf->startTransaction();
+			$_pdf =  clone $pdf;
+
 			//#MultiCell(w, h, txt, border = 0, align = 'J', fill = 0, ln = 1, x = '', y = '', reseth = true, stretch = 0, ishtml = false, autopadding = true, maxh = 0)
 			//$column2_indent
 			$pdf->MultiCell($column_width - $column_header_indent, 1, $meeting_header  , 0, 'J', 0, 2, $column_x + $column_header_indent, '', true , 0, true, true, 0, 'T', true);
@@ -553,14 +561,12 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			}
 
 			$pdf->MultiCell($column_width - $column2_indent , 1,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
-			$end_page = $pdf->getPage();
+			$end_page = $pdf->PageNo();
 
 
-			if ($end_page == $start_page) {
-				//if we are still onthe same page, commit
-				$pdf->commitTransaction();
-			}else{ //we would have popped to a new page
-				$pdf = $pdf->rollbackTransaction();
+			if ($end_page != $start_page) {
+ 				//we would have popped to a new page
+				$pdf = $_pdf;
 
 				if($thisday !== $current_day){
 					//<div style="background-color:black">
@@ -582,7 +588,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				$pdf->SetXY($column_x,$column_y, true);
 
 
-				if($column_html_enable == 1 && $pdf->getPage() == $column_html_page_num  && $current_column == $column_html_column_num){
+				if($column_html_enable == 1 && $pdf->PageNo() == $column_html_page_num  && $current_column == $column_html_column_num){
 					//put custom html in a certain column:
 					$pdf->MultiCell($column_width, 1,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 
@@ -638,18 +644,17 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 		foreach ($html_array as $html_block) {
 			$html_block .= $html_delimiter; //put back what we striped out
 
-			$start_page = $pdf->getPage();
+			$start_page = $pdf->PageNo();
 
-			$pdf->startTransaction();
+			//$pdf->startTransaction();
+			$_pdf =  clone $pdf;
 			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
-			$end_page = $pdf->getPage();
+			$end_page = $pdf->PageNo();
 
 			//if we are still onthe same page
-			if ($end_page == $start_page) {
-
-				$pdf->commitTransaction();
-			}else{ //we would have popped to a new page
-				$pdf = $pdf->rollbackTransaction();
+			if ($end_page != $start_page) {
+ //we would have popped to a new page
+				$pdf = $_pdf; //rollback
 
 				$current_column++;
 
@@ -668,7 +673,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 		}//end of Loop
 	}//end of if
 
-	//write_log("number of pages: " . $pdf->getPage());
+	//write_log("number of pages: " . $pdf->PageNo());
 	//this seems to make php happy:
 	ob_end_clean();
 	//$pdf->Output('meeting_list.pdf', 'I');
