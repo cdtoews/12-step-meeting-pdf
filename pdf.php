@@ -23,7 +23,11 @@ ini_set('memory_limit', '-1');
 				$header_font_size = (int)  get_option("tsmp_header_font_size");
 				$this->SetFont('Arial', 'B', $header_font_size);
 
-				$this->Cell(0, 15, $header_text);
+				//set header cell to be vertically centered in margin
+				$header_y_placement = ((((int) get_option('tsmp_margin')) / 2) - 2);
+				$this->SetXY(0,$header_y_placement);
+
+				$this->Cell( get_option('tsmp_width'), 0,$header_text, 0, 1,"C");
 			}
 		}
 	}//end of class
@@ -153,7 +157,7 @@ ini_set('memory_limit', '-1');
 function tsmp_create_pdf_table1(){
 	global $wpdb, $margins, $font_table_rows, $page_width, $page_height, $table_padding, $font_header,
 	$header_top, $font_footer, $footer_bottom, $first_column_width, $table_border_width, $font_table_rows,
-	$table_padding, $font_table_header, $first_column_width, $day_column_width, $table_border_width, $font_table_rows,
+	$table_padding, $font_table_header, $first_column_width, $day_column_width, $table_border_width, $font_table_rows, $text_height_in_cell,
 	$table_padding, $first_column_width, $day_column_width, $table_border_width, $inner_page_height, $font_table_rows,
 	$index, $exclude_from_indexes, $zip_codes, $table_padding, $line_height_ratio;
 	//must be a logged-in user to run this page (otherwise last_contact will be null)
@@ -169,6 +173,7 @@ function tsmp_create_pdf_table1(){
 	//don't show these in indexes
 	$exclude_from_indexes	= array('Beginner', 'Candlelight', 'Closed', 'Grapevine', 'Literature', 'Open', 'Topic Discussion');
 
+	$text_height_in_cell = 4;
 	$margin_size = (int) get_option('tsmp_margin');
 	$font_size =  (int) get_option('tsmp_font_size');
 	$header_font_size =  (int) get_option("tsmp_header_font_size");
@@ -323,6 +328,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	}else{
 		$font_size = $arg_font_size;
 	}
+	$text_height_in_cell = 4;
 	$number_of_columns = (int) get_option('tsmp_column_count');
 	$column_padding = (int)  get_option('tsmp_column_padding');
 	$outtro_text = get_option('tsmp_outtro_html');
@@ -382,7 +388,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	//starting x,y for the start of this column
 	$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
 	$column_y = $margin_size;
-
+$pdf->SetXY($column_x,$column_y);
 	// ----------------------------------------------------------
 	//                       Pre HTML
 	// ----------------------------------------------------------
@@ -399,7 +405,8 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			//start a transaction, so if it goes over the edge of the page, we can rollback
 			//$pdf->startTransaction(); // fpdf doens't support transactions
 			$_pdf =  clone $pdf;
-			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+			//write_log("-----writing pre-html. content: " . $html_block);
+			$pdf->MultiCell($column_width, $text_height_in_cell,  $html_block);
 			$end_page = $pdf->PageNo();
 
 			if ($end_page != $start_page) {
@@ -412,11 +419,11 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 					$pdf->AddPage();
 					$current_column = 1;
 				}
-				$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-				$column_y = $margin_size;
-				$pdf->SetXY($column_x,$column_y, true);
+				// $column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+				// $column_y = $margin_size;
+				// $pdf->SetXY($column_x,$column_y);
 				//write the text on the new column [and page]
-				$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+				$pdf->MultiCell($column_width, $text_height_in_cell, $html_block);
 
 			}
 	}//end of Loop
@@ -442,10 +449,12 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			//write_log("page:" . $pdf->PageNo() . " column:" .$current_column . "\n" );
 
 
+			$_pdf =  clone $pdf;
 			$thisday = $mymeeting->get_formatted_day();
 			if($thisday !== $current_day){
 					$current_day = $thisday;
-					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">"  . $thisday . "</font></div>" ;
+					$pdf->MultiCell($column_width, $text_height_in_cell,$thisday,1,'C');
+				//	$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">"  . $thisday . "</font></div>" ;
 			}else{
 				$meeting_header = "<hr>";
 			}
@@ -453,21 +462,17 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 			$start_page = $pdf->PageNo();
 			//write_log("column width:" . $column_width);
 
-			$_pdf =  clone $pdf;
-			$pdf->MultiCell($column_width, 1,  $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+
+			$pdf->MultiCell($column_width, $text_height_in_cell,   $mymeeting->get_text($layout_type) );
 			$end_page = $pdf->PageNo();
 
 
-			if ($end_page != $start_page) {
+			if ($end_page !== $start_page) {
  					//we would have popped to a new page (meaning we need to go to the next column)
 				$pdf = $_pdf; //restore to previous state
 
-				if($thisday !== $current_day){
-					//<div style="background-color:black">
-						$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font  color=\"white\"  size=\"+2\">" . $thisday . "</font></div>" ;
-				}else{
-					$meeting_header =  "<div style=\"background-color:black\" align=\"center\"><font color=\"white\" size=\"+2\">" . $thisday . " (cont)</font></div>" ;
-				}
+				$pdf->MultiCell($column_width, $text_height_in_cell,$thisday,1,0,'C');
+
 				$current_column++;
 
 				if($current_column > $number_of_columns){ //last column on the page
@@ -483,7 +488,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 				if($column_html_enable == 1 && $pdf->PageNo() == $column_html_page_num  && $current_column == $column_html_column_num){
 					//put custom html in a certain column:
-					$pdf->MultiCell($column_width, 1,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+					$pdf->MultiCell($column_width, $text_height_in_cell,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 
 					$current_column++;
 					//now go to the next column (maybe page)
@@ -499,7 +504,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 				} // end of column_html_block
 
 				//write the text on the new column [and page ]
-				$pdf->MultiCell($column_width, 1, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
+				$pdf->MultiCell($column_width, $text_height_in_cell, $meeting_header . $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x, $column_y, true , 0, true, true, 0, 'T', true);
 
 			}
 
@@ -550,21 +555,21 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 			//#MultiCell(w, h, txt, border = 0, align = 'J', fill = 0, ln = 1, x = '', y = '', reseth = true, stretch = 0, ishtml = false, autopadding = true, maxh = 0)
 			//$column2_indent
-			$pdf->MultiCell($column_width - $column_header_indent, 1, $meeting_header  , 0, 'J', 0, 2, $column_x + $column_header_indent, '', true , 0, true, true, 0, 'T', true);
+			$pdf->MultiCell($column_width - $column_header_indent, $text_height_in_cell, $meeting_header  , 0, 'J', 0, 2, $column_x + $column_header_indent, '', true , 0, true, true, 0, 'T', true);
 
 			if($include_time){
 				//need to get xy to use after writing time
 				$currentX = $pdf->getX();
 				$currenty = $pdf->getY();
-				$pdf->MultiCell($column2_indent , 1,   $mymeeting->meeting_array['time_formatted']  , 0, 'J', 0, 2, $column_x ,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+				$pdf->MultiCell($column2_indent , $text_height_in_cell,   $mymeeting->meeting_array['time_formatted']  , 0, 'J', 0, 2, $column_x ,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
 				$pdf->SetXY($currentX,$currenty);
 			}
 
-			$pdf->MultiCell($column_width - $column2_indent , 1,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+			$pdf->MultiCell($column_width - $column2_indent ,$text_height_in_cell,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
 			$end_page = $pdf->PageNo();
 
 
-			if ($end_page != $start_page) {
+			if ($end_page !== $start_page) {
  				//we would have popped to a new page
 				$pdf = $_pdf;
 
@@ -590,7 +595,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 				if($column_html_enable == 1 && $pdf->PageNo() == $column_html_page_num  && $current_column == $column_html_column_num){
 					//put custom html in a certain column:
-					$pdf->MultiCell($column_width, 1,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+					$pdf->MultiCell($column_width, $text_height_in_cell,  $column_html_html, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 
 					$current_column++;
 					//now go to the next column (maybe page)
@@ -608,14 +613,14 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 
 				//write the text on the new column [and page ]
-				$pdf->MultiCell($column_width, 1, $meeting_header  , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+				$pdf->MultiCell($column_width, $text_height_in_cell, $meeting_header  , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
 				//on a new column, we are always going to write the time, so no need for the if
 				$currentX = $pdf->getX();
 				$currenty = $pdf->getY();
-				$pdf->MultiCell($column2_indent , 1,   $mymeeting->meeting_array['time_formatted']  , 0, 'J', 0, 2, $column_x ,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+				$pdf->MultiCell($column2_indent , $text_height_in_cell,   $mymeeting->meeting_array['time_formatted']  , 0, 'J', 0, 2, $column_x ,  $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
 				$pdf->SetXY($currentX,$currenty);
 
-				$pdf->MultiCell($column_width - $column2_indent , 1,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent, $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
+				$pdf->MultiCell($column_width - $column2_indent , $text_height_in_cell,   $mymeeting->get_text($layout_type) , 0, 'J', 0, 2, $column_x + $column2_indent, $pdf->getY() + $y_adjustment, true , 0, true, true, 0, 'T', true);
 
 			}
 
@@ -630,7 +635,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 		//end of $layout_type == 2
 	}else{
 		//shouldn't get here
-		echo "While writing meetins, didn't have a layout_type, odd isn't it?";
+		echo "While writing meetings, didn't have a layout_type, odd isn't it?";
 		exit;
 	}
 
@@ -638,7 +643,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 	// ----------------------------------------------------------
 	//                       Post HTML
 	// ----------------------------------------------------------
-	if($outtro_text != ""){
+	if($outtro_text !== ""){
 		$html_array = explode($html_delimiter, $outtro_text );
 		//$y = $column_y;
 		foreach ($html_array as $html_block) {
@@ -648,11 +653,11 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 			//$pdf->startTransaction();
 			$_pdf =  clone $pdf;
-			$pdf->MultiCell($column_width, 1,  $html_block, 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+			$pdf->MultiCell($column_width, $text_height_in_cell,  $html_block);
 			$end_page = $pdf->PageNo();
 
 			//if we are still onthe same page
-			if ($end_page != $start_page) {
+			if ($end_page !== $start_page) {
  //we would have popped to a new page
 				$pdf = $_pdf; //rollback
 
@@ -663,10 +668,10 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 					$pdf->AddPage();
 					$current_column = 1;
 				}
-				$column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
-				$column_y = $margin_size;
-				$pdf->SetXY($column_x,$column_y, true);
-				$pdf->MultiCell($column_width, 1, $html_block , 0, 'J', 0, 2, $column_x, '', true , 0, true, true, 0, 'T', true);
+				// $column_x = $margin_size + (($column_padding + $column_width) * ($current_column - 1));
+				// $column_y = $margin_size;
+				// $pdf->SetXY($column_x,$column_y, true);
+				$pdf->MultiCell($column_width, 1, $html_block );
 
 			}
 

@@ -121,8 +121,8 @@ class meeting {
       //cobble the meeting text together
       @$parts = explode(', ', $this->meeting_array['formatted_address']);
       $meetingtext = "";
-      $meetingtext .= "<font='+1'><b>" . $this->get_state() . " ";
-      $meetingtext .= $this->get_city() . "</b></font>, ";
+      $meetingtext .= "--" . $this->get_state() . " ";
+      $meetingtext .= $this->get_city() . "--, ";
       $meetingtext .= $this->meeting_array['time_formatted'] . ", ";
       $meetingtext .= "(" . implode (',' , $this->meeting_array['types']) . ") ";
       $meetingtext .= @$this->meeting_array['name'] . ". ";
