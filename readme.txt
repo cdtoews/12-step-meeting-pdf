@@ -4,7 +4,7 @@ Donate link: https://paypal.me/cdtoews
 Tags: 12 step,12 step meeting, 12 step meetings, meeting list, 12 step meeting list
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
