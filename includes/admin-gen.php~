@@ -604,7 +604,7 @@ updateVarView()
 <?php
 
 //for debugging:
-if(false){
+if(true){
   echo "<h2> Options </h2><br>";
   echo "tsmp_column_padding :" .  get_option('tsmp_column_padding') . "<br>";
   echo "tsmp_column_count :" .  get_option('tsmp_column_count') . "<br>";
