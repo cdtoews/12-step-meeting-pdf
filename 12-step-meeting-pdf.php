@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/cdtoews/12-step-meeting-pdf
  * Description: Create PDF meeting list from the 12 Step Meeting List Plugin
  * code forked from https://github.com/meeting-guide/nyintergroup
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Chris Toews
  * Author URI: https://yourtechguys.info
  * Text Domain: 12-step-meeting-pdf
@@ -197,11 +197,11 @@ $meetings = filter_meetings($meetings);
 				'types' => array(), //for indexes
 			);
 		}
-		
+
 		if(!is_array( $meeting['types']))		{
 			$meeting['types'] = [];
 		}
-		
+
 		//for indexes verify_array
 		$rows[$meeting['region_id']][$key]['types'] = array_merge($rows[$meeting['region_id']][$key]['types'], $meeting['types']);
 

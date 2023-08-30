@@ -3,9 +3,9 @@ Contributors: cdtoews
 Donate link: https://paypal.me/cdtoews
 Tags: 12 step,12 step meeting, 12 step meetings, meeting list, 12 step meeting list
 Requires at least: 4.7
-Tested up to: 6.1.1
-Stable tag: 1.0.3
-Requires PHP: 5.6
+Tested up to: 6.3.1
+Stable tag: 1.0.4
+Requires PHP: 8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 This plugin requires '12 Step Meeting List', and allows creation of meeting list PDF
@@ -90,6 +90,10 @@ What it does:
 1. No Screenshots yet
 
 == Changelog ==
+
+
+= 1.0.4 =
+* fixed bug with errors when using custom meeting html
 
 = 1.0.2 =
 * now supports php 8

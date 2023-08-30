@@ -340,7 +340,7 @@ function tsmp_create_pdf_columns($layout_type, $arg_font_size){
 
 	//calculate column width
 	$column_width = ($page_width -  (($number_of_columns-1) * $column_padding) - ($margin_size * 2)  ) / $number_of_columns;
-	$column_height = $page_height - ($margin_size * 2);
+	$column_height = (int)$page_height - ((int)$margin_size * 2);
 	//load libraries
 
 

@@ -86,7 +86,7 @@ class meeting {
       @$parts = explode(', ', $this->meeting_array['formatted_address']);
       $meeting_variables = array
         (
-        array("__types__", implode (',' , $this->meeting_array['types']) ),
+        array("__types__", implode (',' ,( $this->meeting_array['types'] ??  []))) ,
         array("__time__", $this->meeting_array['time_formatted'] ),
         array("__day_of_week__",$this->get_formatted_day() ),
         array("__street_address__", @$parts[0] ),
@@ -94,7 +94,7 @@ class meeting {
         array("__title__",  $this->meeting_array['name'] ),
         array("__state__", $this->get_state() ),
         array("__region__", $this->meeting_array['region'] ),
-        array("__subregion__", $this->meeting_array['sub_region']),
+        array("__subregion__",( $this->meeting_array['sub_region'] ?? null) ),
         array("__location__", @$this->meeting_array['location'] ),
         array("__notes__", @$this->meeting_array['notes'] ),
         array("__location_notes__", @$this->meeting_array['location_notes'] ),
@@ -113,10 +113,10 @@ class meeting {
 
     }else{
       //used for debugging:
-      // foreach($this->meeting_array as $key => $value) {
-      //   write_log( "[$key]  =>  $value");
-      // }
-      // write_log("\n\n");
+      foreach($this->meeting_array as $key => $value) {
+        write_log( "[$key]  =>  $value");
+      }
+      write_log("\n\n");
 
       //cobble the meeting text together
       @$parts = explode(', ', $this->meeting_array['formatted_address']);
